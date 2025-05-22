@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.env
+.env
+venv/
+instance/
+
+# Flask
+*.db
+*.sqlite
+*.log
+
+# IDE
+.vscode/
+*.swp
+*.swo
+.DS_Store
