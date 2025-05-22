@@ -1,3 +1,9 @@
-# 🚗 Vehicle Parking System (Academic Project)
+# 🚗 Vehicle Parking App
 
-This is a web-based Vehicle Parking System developed as part of an academic project. The system supports two roles: **Admin** and **User**.
+A Flask-based web application for managing parking lots, reservations, and user/admin interactions.
+
+## Features
+- Role-based login (Admin/User)
+- Real-time parking spot reservation
+- Admin dashboard for managing lots and users
+- Spot-level tracking with timestamp and cost calculation
