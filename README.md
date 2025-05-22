@@ -1,9 +1,9 @@
-# 🚗 Vehicle Parking App
+# Vehicle Parking App
 
-A Flask-based web application for managing parking lots, reservations, and user/admin interactions.
+A Flask-based web application for managing vehicle parking reservations.
 
 ## Features
-- Role-based login (Admin/User)
-- Real-time parking spot reservation
-- Admin dashboard for managing lots and users
-- Spot-level tracking with timestamp and cost calculation
+- Admin/User role-based access
+- Parking lot and spot management
+- Real-time booking and releasing
+- Timestamp and cost tracking
