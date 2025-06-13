@@ -334,3 +334,210 @@ def delete_parking_lot(lot_id):
     
     flash('Parking lot deleted successfully', 'success')
     return redirect(url_for('admin_parking_lots'))
+
+@app.route('/user/dashboard')
+@login_required
+def user_dashboard():
+    try:
+        if session.get('user_type') != 'user':
+            flash('Access denied', 'danger')
+            return redirect(url_for('index'))
+        
+        # Get user's active reservation if any
+        active_reservation = db.session.query(
+            Reservation, ParkingSpot, ParkingLot
+        ).join(
+            ParkingSpot, Reservation.spot_id == ParkingSpot.id
+        ).join(
+            ParkingLot, ParkingSpot.lot_id == ParkingLot.id
+        ).filter(
+            Reservation.user_id == current_user.id,
+            Reservation.leaving_timestamp.is_(None)
+        ).first()
+        
+        # Check if profile is complete
+        profile_complete = bool(current_user.address and current_user.pincode)
+        
+        # Get user's reservation history
+        reservation_history = db.session.query(
+            Reservation, ParkingSpot, ParkingLot
+        ).join(
+            ParkingSpot, Reservation.spot_id == ParkingSpot.id
+        ).join(
+            ParkingLot, ParkingSpot.lot_id == ParkingLot.id
+        ).filter(
+            Reservation.user_id == current_user.id,
+            Reservation.leaving_timestamp.isnot(None)
+        ).order_by(Reservation.leaving_timestamp.desc()).all()
+        
+        # Calculate total spent
+        total_spent = round(sum(r[0].parking_cost or 0 for r in reservation_history), 2)
+        
+        # Calculate total time spent
+        total_time_spent = 0
+        for reservation in reservation_history:
+            if reservation[0].parking_timestamp and reservation[0].leaving_timestamp:
+                duration = reservation[0].leaving_timestamp - reservation[0].parking_timestamp
+                total_time_spent += duration.total_seconds()
+        
+        # Format total time spent
+        hours = int(total_time_spent // 3600)
+        minutes = int((total_time_spent % 3600) // 60)
+        if hours > 0:
+            total_time_spent = f"{hours}h {minutes}m"
+        else:
+            total_time_spent = f"{minutes}m"
+        
+        # Get current time in UTC for duration calculations
+        now = datetime.utcnow()
+        
+        # Chart data for history
+        chart_data = {
+            'labels': [f"{r[2].prime_location_name} ({r[0].parking_timestamp.strftime('%d/%m/%Y')})" for r in reservation_history[-5:]],
+            'costs': [float(r[0].parking_cost or 0) for r in reservation_history[-5:]]
+        }
+        
+        return render_template('user_dashboard.html',
+            active_reservation=active_reservation,
+            profile_complete=profile_complete,
+            reservation_history=reservation_history,
+            total_spent=total_spent,
+            total_time_spent=total_time_spent,
+            chart_data=chart_data,
+            now=now)
+    except Exception as e:
+        flash('An error occurred while loading the dashboard', 'danger')
+        return redirect(url_for('index'))
+
+@app.route('/user/parking_lots')
+@login_required
+def user_parking_lots():
+    try:
+        if session.get('user_type') != 'user':
+            flash('Access denied', 'danger')
+            return redirect(url_for('index'))
+            
+        # Get all parking lots
+        parking_lots = ParkingLot.query.all()
+        
+        # Get available spots for each lot
+        available_spots = {}
+        available_spot_ids = {}
+        for lot in parking_lots:
+            # Get all spots for this lot
+            spots = ParkingSpot.query.filter_by(lot_id=lot.id).all()
+            
+            # Count available spots (status = 'A')
+            available_count = sum(1 for spot in spots if spot.status == 'A')
+            available_spots[lot.id] = available_count
+            
+            # Get IDs of available spots
+            available_spot_ids[lot.id] = [spot.id for spot in spots if spot.status == 'A']
+        
+        return render_template('user_parking_lots.html',
+                             parking_lots=parking_lots,
+                             available_spots=available_spots,
+                             available_spot_ids=available_spot_ids,
+                             current_user=current_user)
+    except Exception as e:
+        app.logger.error(f"Error loading parking lots: {str(e)}\n{traceback.format_exc()}")
+        flash('An error occurred while loading parking lots. Please try again later.', 'error')
+        return redirect(url_for('user_dashboard'))
+    
+@app.route('/book_spot', methods=['POST'])
+@login_required
+def book_spot():
+    try:
+        if session.get('user_type') != 'user':
+            return jsonify({
+                'success': False,
+                'message': 'Access denied'
+            })
+        
+        # Check if user has completed their profile
+        if not current_user.address or not current_user.pincode:
+            return jsonify({
+                'success': False,
+                'message': 'Please complete your profile before booking a spot.'
+            })
+        
+        # Check for active bookings
+        active_reservation = Reservation.query.filter_by(
+            user_id=current_user.id,
+            leaving_timestamp=None
+        ).first()
+        
+        if active_reservation:
+            return jsonify({
+                'success': False,
+                'message': 'You already have an active booking.'
+            })
+        
+        # Get form data
+        lot_id = request.form.get('lot_id')
+        vehicle_number = request.form.get('vehicle_number')
+        spot_id = request.form.get('spot_id')
+        
+        # Validate required fields
+        if not lot_id or not vehicle_number:
+            return jsonify({
+                'success': False,
+                'message': 'Please provide all required information.'
+            })
+        
+        # Get parking lot
+        parking_lot = ParkingLot.query.get(lot_id)
+        if not parking_lot:
+            return jsonify({
+                'success': False,
+                'message': 'Invalid parking lot selected.'
+            })
+        
+        # If specific spot is selected, verify it's available
+        if spot_id:
+            spot = ParkingSpot.query.get(spot_id)
+            if not spot or spot.lot_id != int(lot_id) or spot.status != 'A':
+                return jsonify({
+                    'success': False,
+                    'message': 'Selected spot is not available.'
+                })
+        else:
+            # Find an available spot
+            spot = ParkingSpot.query.filter_by(
+                lot_id=lot_id,
+                status='A'
+            ).first()
+            
+            if not spot:
+                return jsonify({
+                    'success': False,
+                    'message': 'No available spots in this parking lot.'
+                })
+        
+        # Create reservation
+        reservation = Reservation(
+            user_id=current_user.id,
+            spot_id=spot.id,
+            vehicle_number=vehicle_number,
+            parking_timestamp=datetime.utcnow()
+        )
+        
+        # Update spot status
+        spot.status = 'O'  # Occupied
+        
+        # Save changes
+        db.session.add(reservation)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Booking successful!'
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error creating booking: {str(e)}\n{traceback.format_exc()}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': 'An error occurred while creating the booking.'
+        })

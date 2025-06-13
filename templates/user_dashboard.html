@@ -1,0 +1,637 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard - ParkEase{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 px-md-5 py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="fw-bold" style="color: var(--primary-color);">
+                <i class="fas fa-user-circle me-2"></i>Welcome, {{ current_user.name }}
+            </h2>
+            <p class="text-muted dark-mode-text">Here's your parking activity overview</p>
+        </div>
+    </div>
+
+    <!-- Active Reservation Section -->
+    {% if active_reservation and active_reservation[0] %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-white dark-mode-card rounded shadow">
+                <div class="card-header bg-white dark-mode-card border-bottom">
+                    <h5 class="mb-0 text-primary dark-mode-text">
+                        <i class="bi bi-info-circle me-2"></i>Active Parking Reservation
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-3 dark-mode-text">Your vehicle is currently parked at <strong>{{ active_reservation[2].prime_location_name }}</strong>.</p>
+                    <hr class="dark-mode-border">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock me-2 dark-mode-text"></i>
+                                    <span class="dark-mode-text"><strong>Parked since:</strong> {{ active_reservation[0].parking_timestamp.strftime('%Y-%m-%d %H:%M') }} UTC</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-hash me-2 dark-mode-text"></i>
+                                    <span class="dark-mode-text"><strong>Spot ID:</strong> {{ active_reservation[1].id }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-tag me-2 dark-mode-text"></i>
+                                    <span class="dark-mode-text"><strong>Price per hour:</strong> ₹{{ active_reservation[2].price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <button type="button" class="btn btn-danger vacate-btn" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                                <i class="bi bi-box-arrow-right me-2"></i>Vacate Spot
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-white dark-mode-card rounded shadow">
+                <div class="card-header bg-white dark-mode-card border-bottom">
+                    <h5 class="mb-0 text-primary dark-mode-text">
+                        <i class="fas fa-parking me-2"></i>No Active Reservation
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-3 dark-mode-text">You don't have any active parking reservation. Would you like to book a parking spot?</p>
+                    <hr class="dark-mode-border">
+                    <a href="{{ url_for('user_parking_lots') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="fas fa-plus-circle me-2"></i>Book a Parking Spot
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Stats Cards Section -->
+    <div class="row mb-4">
+        <div class="col-12 col-lg-8 mb-4">
+            <div class="card dashboard-card recent-costs-card">
+                <div class="card-header bg-white dark-mode-card border-bottom">
+                    <h5 class="mb-0 dark-mode-text">
+                        <i class="fas fa-chart-line me-2"></i>Recent Parking Costs
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="costBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white dark-mode-card border-bottom">
+                    <h5 class="mb-0 dark-mode-text">
+                        <i class="fas fa-car me-2"></i>Parking Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-4">
+                        <div class="card bg-gradient-primary text-white rounded shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle me-3">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title mb-2">Total Spent</h6>
+                                        <h2 class="mb-0">₹{{ total_spent }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card bg-gradient-success text-white rounded shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle me-3">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title mb-2">Reservations</h6>
+                                        <h2 class="mb-0">{{ reservation_history|length }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card bg-gradient-warning text-white rounded shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle me-3">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title mb-2">Total Time Spent</h6>
+                                        <h2 class="mb-0">{{ total_time_spent }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation History Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-white dark-mode-card rounded shadow">
+                <div class="card-header bg-white dark-mode-card border-bottom">
+                    <h5 class="mb-0 text-primary dark-mode-text">
+                        <i class="fas fa-history me-2"></i>Reservation History
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="px-3">ID</th>
+                                    <th class="px-3">Parking Lot</th>
+                                    <th class="px-3">Parked At</th>
+                                    <th class="px-3">Left At</th>
+                                    <th class="px-3">Duration</th>
+                                    <th class="px-3">Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reservation, spot, lot in reservation_history %}
+                                <tr>
+                                    <td class="px-3">{{ reservation.id }}</td>
+                                    <td class="px-3">{{ lot.prime_location_name }}</td>
+                                    <td class="px-3">{{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+                                    <td class="px-3">{{ reservation.leaving_timestamp.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+                                    <td class="px-3">
+                                        {% set duration = (reservation.leaving_timestamp - reservation.parking_timestamp).total_seconds() // 60 %}
+                                        {% if duration < 60 %}
+                                            {{ duration|int }} minutes
+                                        {% else %}
+                                            {{ (duration // 60)|int }} hours, {{ (duration % 60)|int }} minutes
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-3">₹{{ reservation.parking_cost }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Confirmation Modal -->
+{% if active_reservation and active_reservation[0] %}
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="paymentModalLabel">
+                    <i class="fas fa-credit-card me-2 text-primary"></i>Payment Confirmation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <!-- Parking Duration and Cost -->
+                <div class="booking-details mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-clock text-primary me-2"></i>
+                        <span class="dark-mode-text">Parking Duration: <span id="parkingDuration" class="fw-bold"></span></span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-tag text-primary me-2"></i>
+                        <span class="dark-mode-text">Price per hour: <span class="fw-bold">₹{{ active_reservation[2].price }}</span></span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-calculator text-primary me-2"></i>
+                        <span class="dark-mode-text">Total Amount: <span id="totalAmount" class="fw-bold"></span></span>
+                    </div>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="payment-methods mb-4">
+                    <label class="form-label small text-muted mb-3">Select Payment Method</label>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="UPI" checked>
+                            <label class="form-check-label dark-mode-text" for="upi">
+                                <i class="fas fa-mobile-alt me-2"></i>UPI
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="card" value="Card">
+                            <label class="form-check-label dark-mode-text" for="card">
+                                <i class="fas fa-credit-card me-2"></i>Card
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="Wallet">
+                            <label class="form-check-label dark-mode-text" for="wallet">
+                                <i class="fas fa-wallet me-2"></i>Wallet
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('vacate_spot', reservation_id=active_reservation[0].id) }}" method="POST" id="paymentForm">
+                    <input type="hidden" name="payment_method" id="paymentMethodInput">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check-circle me-2"></i>Confirm Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentModal = document.getElementById('paymentModal');
+    if (paymentModal) {
+        paymentModal.addEventListener('show.bs.modal', function() {
+            // Calculate parking duration using UTC timestamps
+            const parkingTime = new Date('{{ active_reservation[0].parking_timestamp.strftime("%Y-%m-%d %H:%M:%S") }}Z');
+            const now = new Date('{{ now.strftime("%Y-%m-%d %H:%M:%S") }}Z');
+            const durationMs = now - parkingTime;
+            const totalMinutes = Math.floor(durationMs / (1000 * 60));
+            
+            // Format duration
+            let durationText = '';
+            if (totalMinutes < 60) {
+                durationText = `${totalMinutes} minute${totalMinutes !== 1 ? 's' : ''}`;
+            } else {
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                durationText = `${hours} hour${hours !== 1 ? 's' : ''}`;
+                if (minutes > 0) {
+                    durationText += `, ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                }
+            }
+            
+            // Calculate total amount
+            const pricePerHour = {{ active_reservation[2].price }};
+            const totalHours = totalMinutes / 60;
+            const totalAmount = (totalHours * pricePerHour).toFixed(2);
+            
+            // Update modal content
+            document.getElementById('parkingDuration').textContent = durationText;
+            document.getElementById('totalAmount').textContent = `₹${totalAmount}`;
+        });
+    }
+
+    // Update payment method before form submission
+    const paymentForm = document.getElementById('paymentForm');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', function(e) {
+            const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            document.getElementById('paymentMethodInput').value = selectedMethod;
+        });
+    }
+
+    // Initialize DataTable
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            "order": [[ 0, "desc" ]], // Default sort by ID descending
+            "pageLength": 5, // Show 5 entries per page
+            "lengthMenu": [ [5, 10, 25, -1], [5, 10, 25, "All"] ],
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records..."
+            }
+        });
+    });
+
+    // Calculate total time spent
+    const totalTimeSpent = {{ total_time_spent|tojson|safe }};
+    document.getElementById('totalTimeSpent').textContent = totalTimeSpent;
+});
+</script>
+{% endif %}
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Complete Your Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('edit_profile') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ current_user.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" required>{{ current_user.address }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pincode" class="form-label">Pin Code</label>
+                        <input type="text" class="form-control" id="pincode" name="pincode" pattern="[0-9]{6}" maxlength="6" value="{{ current_user.pincode }}" required>
+                        <div class="form-text">Enter a 6-digit pin code</div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Booking Warning Modal -->
+<div class="modal fade" id="activeBookingWarningModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                    Warning
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">You already have an active parking spot booked. Please cancel or complete it before booking a new one.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="/my-bookings" class="btn btn-primary">View My Bookings</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Book Parking Modal -->
+<div class="modal fade" id="bookParkingModal" tabindex="-1" aria-labelledby="bookParkingModalLabel" aria-hidden="true">
+    <!-- ... existing modal content ... -->
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    }
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    .table th {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .alert {
+        border-radius: var(--border-radius);
+    }
+    
+    /* Card Styles */
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        background-color: #ffffff !important;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .card-header {
+        padding: 1rem 1.5rem;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    
+    .card-header h5 {
+        font-weight: 600;
+        color: #000000 !important;
+    }
+    
+    .card-body {
+        color: #000000 !important;
+    }
+    
+    .dark-mode-text {
+        color: #000000 !important;
+    }
+    
+    /* Dark mode styles */
+    body[data-theme="dark"] .card {
+        background-color: #000000 !important;
+    }
+    
+    body[data-theme="dark"] .card-header {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+    }
+    
+    body[data-theme="dark"] .card-header h5 {
+        color: #ffffff !important;
+        }
+    
+    body[data-theme="dark"] .card-body {
+        color: #ffffff !important;
+    }
+    
+    body[data-theme="dark"] .dark-mode-text {
+        color: #ffffff !important;
+    }
+    
+    body[data-theme="dark"] .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    /* Table styles */
+    .table {
+        color: #000000 !important;
+    }
+    
+    body[data-theme="dark"] .table {
+        color: #ffffff !important;
+    }
+    
+    body[data-theme="dark"] .table thead th {
+        background-color: #000000 !important;
+        border-bottom-color: #2d3748 !important;
+    }
+    
+    body[data-theme="dark"] .table td {
+        border-color: #2d3748 !important;
+    }
+    
+    /* Remove unnecessary section */
+    .search-filter-container,
+    #parkingLotsContainer {
+        display: none !important;
+    }
+
+    /* Parking Summary Card Styles */
+    .icon-circle {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .icon-circle i {
+        transition: all 0.3s ease;
+    }
+
+    /* Light Mode Styles */
+    [data-theme="light"] .icon-circle {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    [data-theme="light"] .icon-circle i {
+        color: #ffffff !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    /* Dark Mode Styles */
+    [data-theme="dark"] .icon-circle {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    [data-theme="dark"] .icon-circle i {
+        color: #ffffff !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    /* Hover Effects */
+    .card:hover .icon-circle {
+        transform: scale(1.05);
+    }
+
+    .card:hover .icon-circle i {
+        transform: scale(1.1);
+    }
+
+    /* Card Background Gradients */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #00838f 100%);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+    }
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Parse chart data from server
+    const chartData = {{ chart_data|safe }};
+    
+    // Function to check dark mode
+    function isDarkMode() {
+        return document.body.getAttribute('data-theme') === 'dark';
+    }
+    
+    // Bar Chart for Recent Costs
+    const ctxBar = document.getElementById('costBarChart').getContext('2d');
+    const costBarChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Parking Cost (₹)',
+                data: chartData.costs,
+                backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                hoverBackgroundColor: 'rgba(46, 89, 217, 0.9)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode() ? '#000000' : 'rgb(255,255,255)',
+                    borderColor: isDarkMode() ? '#2d3748' : '#dddfeb',
+                    borderWidth: 1,
+                    titleColor: isDarkMode() ? '#ffffff' : '#000000',
+                    bodyColor: isDarkMode() ? '#ffffff' : '#000000',
+                    callbacks: {
+                        label: function(context) {
+                            return `₹${context.raw}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: isDarkMode() ? '#2d3748' : '#e3e6f0'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: isDarkMode() ? '#2d3748' : '#e3e6f0'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Update chart colors when theme changes
+    document.addEventListener('themeChanged', function() {
+        costBarChart.options.scales.x.grid.color = isDarkMode() ? '#2d3748' : '#e3e6f0';
+        costBarChart.options.scales.y.grid.color = isDarkMode() ? '#2d3748' : '#e3e6f0';
+        costBarChart.options.plugins.tooltip.backgroundColor = isDarkMode() ? '#000000' : 'rgb(255,255,255)';
+        costBarChart.options.plugins.tooltip.borderColor = isDarkMode() ? '#2d3748' : '#dddfeb';
+        costBarChart.update();
+    });
+
+    // Initialize DataTable
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            "order": [[ 0, "desc" ]], // Default sort by ID descending
+            "pageLength": 5, // Show 5 entries per page
+            "lengthMenu": [ [5, 10, 25, -1], [5, 10, 25, "All"] ],
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records..."
+            }
+        });
+    });
+</script>
+{% endblock %}
