@@ -134,3 +134,203 @@ def logout():
     session.pop('user_type', None)
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
+
+
+@app.route('/admin/dashboard')
+@login_required
+def admin_dashboard():
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    try:
+        parking_lots = ParkingLot.query.all()
+        total_spots = ParkingSpot.query.count()
+        occupied_spots = ParkingSpot.query.filter_by(status='O').count()
+        available_spots = total_spots - occupied_spots
+        users = User.query.count()
+        
+        # Get today's date at midnight
+        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        yesterday = today - timedelta(days=1)
+        
+        # Calculate today's revenue
+        today_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+            .filter(Reservation.leaving_timestamp >= today,
+                    Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+        
+        # Calculate yesterday's revenue
+        yesterday_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+            .filter(Reservation.leaving_timestamp >= yesterday,
+                    Reservation.leaving_timestamp < today,
+                    Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+        
+        # Calculate revenue change
+        revenue_change = today_revenue - yesterday_revenue
+        revenue_change_percent = (revenue_change / yesterday_revenue * 100) if yesterday_revenue > 0 else 0
+        
+        # Calculate new users today
+        new_users_today = User.query.filter(User.created_at >= today).count()
+        new_users_yesterday = User.query.filter(
+            User.created_at >= yesterday,
+            User.created_at < today
+        ).count()
+        
+        # Calculate user change
+        user_change = new_users_today - new_users_yesterday
+        user_change_percent = (user_change / new_users_yesterday * 100) if new_users_yesterday > 0 else 0
+        
+        # Calculate spot changes
+        occupied_spots_yesterday = ParkingSpot.query.filter_by(status='O').count()
+        spot_change = occupied_spots - occupied_spots_yesterday
+        
+        # Total revenue calculations
+        total_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+            .filter(Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+        
+        # Prepare data for charts
+        lot_data = []
+        for lot in parking_lots:
+            # Get revenue for this lot
+            lot_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+                .join(ParkingSpot, Reservation.spot_id == ParkingSpot.id)\
+                .filter(ParkingSpot.lot_id == lot.id,
+                        Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+            
+            # Get spot counts
+            total_lot_spots = ParkingSpot.query.filter_by(lot_id=lot.id).count()
+            occupied_lot_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='O').count()
+            
+            lot_data.append({
+                'name': lot.prime_location_name,
+                'revenue': lot_revenue,
+                'total_spots': total_lot_spots,
+                'occupied_spots': occupied_lot_spots
+            })
+        
+        # Prepare chart data
+        chart_data = {
+            'lot_data': lot_data
+        }
+        
+        return render_template('admin_dashboard.html',
+                            parking_lots=parking_lots,
+                            total_spots=total_spots,
+                            occupied_spots=occupied_spots,
+                            available_spots=available_spots,
+                            users=users,
+                            today_revenue=today_revenue,
+                            yesterday_revenue=yesterday_revenue,
+                            revenue_change=revenue_change,
+                            revenue_change_percent=revenue_change_percent,
+                            new_users_today=new_users_today,
+                            user_change=user_change,
+                            user_change_percent=user_change_percent,
+                            spot_change=spot_change,
+                            total_revenue=total_revenue,
+                            lot_data=lot_data,
+                            chart_data=chart_data)
+    except Exception as e:
+        app.logger.error(f"Error in admin_dashboard: {str(e)}")
+        flash(f'An error occurred while loading the dashboard: {str(e)}', 'danger')
+        return redirect(url_for('index'))
+    
+@app.route('/admin/parking_lots', methods=['GET', 'POST'])
+@login_required
+def admin_parking_lots():
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    form = ParkingLotForm()
+    if form.validate_on_submit():
+        parking_lot = ParkingLot(
+            prime_location_name=form.prime_location_name.data,
+            price=form.price.data,
+            address=form.address.data,
+            pincode=form.pincode.data,
+            max_spots=form.max_spots.data
+        )
+        db.session.add(parking_lot)
+        db.session.commit()
+        
+        # Auto-generate parking spots
+        for i in range(1, parking_lot.max_spots + 1):
+            spot = ParkingSpot(
+                lot_id=parking_lot.id,
+                status='A'  # Available
+            )
+            db.session.add(spot)
+        
+        db.session.commit()
+        flash('Parking lot added successfully', 'success')
+        return redirect(url_for('admin_parking_lots'))
+    
+    parking_lots = ParkingLot.query.all()
+    lot_revenues = {}
+    for lot in parking_lots:
+        lot_revenue = db.session.query(func.sum(Reservation.parking_cost))\
+            .join(ParkingSpot, Reservation.spot_id == ParkingSpot.id)\
+            .filter(ParkingSpot.lot_id == lot.id, Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+        lot_revenues[lot.id] = lot_revenue
+    return render_template('admin_parking_lots.html', form=form, parking_lots=parking_lots, lot_revenues=lot_revenues)
+
+@app.route('/admin/parking_lot/<int:lot_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_parking_lot(lot_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    parking_lot = ParkingLot.query.get_or_404(lot_id)
+    
+    if request.method == 'POST':
+        # Update parking lot details
+        parking_lot.prime_location_name = request.form.get('prime_location_name')
+        parking_lot.price = float(request.form.get('price'))
+        parking_lot.address = request.form.get('address')
+        parking_lot.pincode = request.form.get('pincode')
+        
+        # Handle max_spots changes
+        new_max_spots = int(request.form.get('max_spots'))
+        if new_max_spots > parking_lot.max_spots:
+            # Add new spots
+            for i in range(parking_lot.max_spots + 1, new_max_spots + 1):
+                spot = ParkingSpot(
+                    lot_id=parking_lot.id,
+                    status='A'  # Available
+                )
+                db.session.add(spot)
+        
+        parking_lot.max_spots = new_max_spots
+        db.session.commit()
+        
+        flash('Parking lot updated successfully', 'success')
+        return redirect(url_for('admin_parking_lots'))
+    
+    return redirect(url_for('admin_parking_lots'))
+
+@app.route('/admin/parking_lot/<int:lot_id>/delete', methods=['POST'])
+@login_required
+def delete_parking_lot(lot_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    parking_lot = ParkingLot.query.get_or_404(lot_id)
+    
+    # Check if any spots are occupied
+    occupied_spots = ParkingSpot.query.filter_by(lot_id=lot_id, status='O').count()
+    if occupied_spots > 0:
+        flash('Cannot delete parking lot with occupied spots', 'danger')
+        return redirect(url_for('admin_parking_lots'))
+    
+    # Delete all spots first
+    ParkingSpot.query.filter_by(lot_id=lot_id).delete()
+    
+    # Delete the parking lot
+    db.session.delete(parking_lot)
+    db.session.commit()
+    
+    flash('Parking lot deleted successfully', 'success')
+    return redirect(url_for('admin_parking_lots'))
