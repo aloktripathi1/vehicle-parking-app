@@ -541,3 +541,75 @@ def book_spot():
             'success': False,
             'message': 'An error occurred while creating the booking.'
         })
+
+@app.route('/user/vacate_spot/<int:reservation_id>', methods=['POST'])
+@login_required
+def vacate_spot(reservation_id):
+    if session.get('user_type') != 'user':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    reservation = Reservation.query.get_or_404(reservation_id)
+    
+    # Ensure the reservation belongs to the current user
+    if reservation.user_id != current_user.id:
+        flash('Access denied', 'danger')
+        return redirect(url_for('user_dashboard'))
+    
+    # Ensure the reservation is active
+    if reservation.leaving_timestamp is not None:
+        flash('This reservation is already completed', 'warning')
+        return redirect(url_for('user_dashboard'))
+    
+    # Get the spot and update its status
+    spot = ParkingSpot.query.get(reservation.spot_id)
+    spot.status = 'A'  # Available
+    
+    # Update reservation
+    leaving_time = datetime.now()
+    reservation.leaving_timestamp = leaving_time
+    
+    # Calculate parking duration in minutes
+    parking_time = reservation.parking_timestamp
+    duration_minutes = (leaving_time - parking_time).total_seconds() / 60
+    
+    # Get parking lot price
+    parking_lot = ParkingLot.query.get(spot.lot_id)
+    
+    # Calculate cost based on minutes
+    reservation.parking_cost = round((duration_minutes / 60) * parking_lot.price, 2)
+    
+    # Update payment details
+    payment_method = request.form.get('payment_method')
+    if payment_method:
+        reservation.payment_status = 'Paid'
+        reservation.payment_mode = payment_method
+        reservation.payment_time = leaving_time
+    
+    db.session.commit()
+    
+    # Format duration for flash message
+    if duration_minutes < 60:
+        duration_text = f"{int(duration_minutes)} minutes"
+    else:
+        hours = int(duration_minutes // 60)
+        minutes = int(duration_minutes % 60)
+        duration_text = f"{hours} hour{'s' if hours != 1 else ''}"
+        if minutes > 0:
+            duration_text += f", {minutes} minute{'s' if minutes != 1 else ''}"
+    
+    flash(f'Spot vacated successfully. Duration: {duration_text}. Payment of ₹{reservation.parking_cost:.2f} completed via {payment_method}.', 'success')
+    return redirect(url_for('user_dashboard'))
+
+def has_active_booking(user_id):
+    """Check if user has any active bookings"""
+    try:
+        active_statuses = ['active', 'booked', 'in-progress']
+        active_booking = Reservation.query.filter(
+            Reservation.user_id == user_id,
+            Reservation.status.in_(active_statuses)
+        ).first()
+        return active_booking is not None
+    except Exception as e:
+        print(f"Error checking active bookings: {e}")
+        return False
