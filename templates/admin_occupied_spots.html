@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+
+{% block title %}Occupied Spots - Vehicle Parking App{% endblock %}
+
+{% block head %}
+<style>
+    .occupied-spots-card-container {
+        width: 98%;
+        max-width: 1400px;
+        margin: 1.5rem auto;
+        padding: 0 1rem;
+    }
+    .occupied-spots-heading {
+        margin: 1.5rem 0 0.5rem;
+        padding-left: 0.5rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        color: var(--text-color);
+    }
+    .admin-subheading {
+        padding-left: 0.5rem;
+        color: var(--text-color);
+        opacity: 0.7;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .card {
+        border-radius: var(--border-radius);
+        border: 1px solid #d1d5db;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 1.5rem;
+        background-color: #f8f9fa;
+    }
+    .card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        border-color: var(--primary-color);
+    }
+    .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid var(--light-bg);
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--text-color);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .card-header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .card-header-right {
+        display: flex;
+        align-items: center;
+    }
+    .card-body {
+        padding: 1rem 1.5rem;
+        background-color: #f8f9fa;
+    }
+    .table {
+        margin-bottom: 0;
+        background-color: #f8f9fa;
+        color: var(--text-color);
+    }
+    .table th, .table td {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        vertical-align: middle;
+        white-space: nowrap;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--border-color);
+        background-color: #f8f9fa;
+    }
+    .table th {
+        font-weight: 600;
+        background: var(--card-bg);
+        border-bottom: 2px solid var(--border-color);
+    }
+    .table td {
+        color: var(--text-color);
+        border-bottom: 1px solid var(--border-color);
+        background: var(--card-bg);
+    }
+    .search-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 400px;
+        background: #f8f9fa;
+        border-radius: var(--border-radius);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        padding: 0.25rem 0.5rem;
+        transition: box-shadow 0.2s;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .search-input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+        flex: 1 1 0%;
+        color: var(--text-color);
+        border: 1px solid transparent;
+    }
+    .search-input:focus {
+        background: transparent;
+        box-shadow: none;
+        border-color: var(--primary-color);
+    }
+    .search-btn {
+        border-radius: 50px;
+        padding: 0.5rem 1.1rem;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .search-btn:focus, .search-btn:hover {
+        background: var(--color-primary-hover, #0b5ed7);
+        color: #fff;
+        outline: none;
+    }
+    .btn-action {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+    }
+    .modal-dialog {
+        max-width: 400px;
+    }
+    .modal-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .modal-body {
+        padding: 1.5rem;
+    }
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+    .modal-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    .modal-body p {
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+    }
+    .modal-body p:last-child {
+        margin-bottom: 0;
+    }
+    .modal-body strong {
+        color: var(--text-color);
+        font-weight: 600;
+    }
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+        .search-container {
+            max-width: 100%;
+            padding: 0.15rem 0.25rem;
+        }
+        .search-btn {
+            padding: 0.45rem 0.9rem;
+            font-size: 0.95rem;
+        }
+        .table th, .table td {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+        /* Keep Spot ID and User columns visible on mobile */
+        .table th:nth-child(3),
+        .table td:nth-child(3),
+        .table th:nth-child(4),
+        .table td:nth-child(4),
+        .table th:nth-child(5),
+        .table td:nth-child(5),
+        .table th:nth-child(6),
+        .table td:nth-child(6) {
+            display: none;
+        }
+        .card-body {
+            padding: 0.75rem;
+        }
+    }
+    .card, .card-header, .card-body, .table, .table th, .table td, .search-container, .search-input, .search-btn, .modal-content, .modal-header, .modal-body, .modal-footer {
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .table th, .table td {
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .search-container, .search-input, .search-btn {
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .modal-content, .modal-header, .modal-body, .modal-footer {
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+</style>
+<style>
+    body[data-theme="dark"] .card,
+    body[data-theme="dark"] .card-header,
+    body[data-theme="dark"] .card-body,
+    body[data-theme="dark"] .table,
+    body[data-theme="dark"] .table th,
+    body[data-theme="dark"] .table td,
+    body[data-theme="dark"] .search-container,
+    body[data-theme="dark"] .search-input,
+    body[data-theme="dark"] .search-btn,
+    body[data-theme="dark"] .modal-content,
+    body[data-theme="dark"] .modal-header,
+    body[data-theme="dark"] .modal-body,
+    body[data-theme="dark"] .modal-footer {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border-color: #2d3748 !important;
+    }
+    body[data-theme="dark"] .text-muted,
+    body[data-theme="dark"] .admin-subheading {
+        color: #ffffff !important;
+        opacity: 0.7;
+    }
+</style>
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 px-md-5 py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold mb-2" style="color: var(--primary-color);">
+                <i class="fas fa-car me-2"></i>Occupied Parking Spots
+            </h2>
+            <form class="search-container d-flex align-items-center" role="search" aria-label="Search occupied spots" onsubmit="return false;">
+                <input type="text" id="searchInput" class="search-input flex-grow-1" placeholder="Search by Spot ID, User Name, or Vehicle Number" aria-label="Search by Spot ID, User Name, or Vehicle Number">
+                <button type="button" id="searchButton" class="btn btn-primary ms-2 search-btn" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Occupied Spots Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-white dark-mode-card rounded shadow">
+                <div class="card-header bg-white dark-mode-card border-bottom">
+                    <div class="card-header-left">
+                        <h5 class="mb-0 text-primary dark-mode-text">
+                            🅿️ Currently Occupied Spots
+                        </h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table admin-table" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="dark-mode-text">Spot ID</th>
+                                    <th class="dark-mode-text">User</th>
+                                    <th class="dark-mode-text">Vehicle Number</th>
+                                    <th class="dark-mode-text">Parked Since</th>
+                                    <th class="dark-mode-text">Duration</th>
+                                    <th class="dark-mode-text">Current Cost</th>
+                                    <th class="dark-mode-text">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for spot, lot, reservation, user in occupied_spots %}
+                                <tr>
+                                    <td class="dark-mode-text">{{ spot.id }}</td>
+                                    <td class="dark-mode-text">{{ user.name }} ({{ user.username }})</td>
+                                    <td class="dark-mode-text">{{ reservation.vehicle_number if reservation.vehicle_number else 'N/A' }}</td>
+                                    <td class="dark-mode-text timestamp-cell" data-utc="{{ reservation.parking_timestamp.isoformat() }}"></td>
+                                    <td class="dark-mode-text duration" data-start="{{ reservation.parking_timestamp.isoformat() }}"></td>
+                                    <td class="dark-mode-text">
+                                        {% set hours = (now - reservation.parking_timestamp).total_seconds() / 3600 %}
+                                        ₹{{ "%.2f"|format(hours * lot.price) }}
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button type="button" class="btn btn-sm btn-danger btn-action" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#endReservationModal{{ spot.id }}"
+                                                    title="End Reservation">
+                                                <i class="fas fa-stop-circle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Reservation Modals -->
+{% for spot, lot, reservation, user in occupied_spots %}
+<div class="modal fade" id="endReservationModal{{ spot.id }}" tabindex="-1" aria-labelledby="endReservationModalLabel{{ spot.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="endReservationModalLabel{{ spot.id }}">End Reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to end this reservation?</p>
+                <p><strong>Spot ID:</strong> {{ spot.id }}</p>
+                <p><strong>User:</strong> {{ user.name }} ({{ user.username }})</p>
+                <p><strong>Vehicle Number:</strong> {{ reservation.vehicle_number }}</p>
+                <p><strong>Parked Since:</strong> {{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('end_reservation', spot_id=spot.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">End Reservation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Convert all timestamps to IST
+    document.querySelectorAll('.timestamp-cell').forEach(element => {
+        const utcDate = element.getAttribute('data-utc');
+        if (utcDate) {
+            element.textContent = TimeUtils.convertUTCtoIST(utcDate);
+        }
+    });
+
+    // Calculate and display durations
+    document.querySelectorAll('.duration').forEach(element => {
+        const startTime = element.getAttribute('data-start');
+        if (startTime) {
+            function updateDuration() {
+                element.textContent = TimeUtils.calculateDuration(startTime);
+            }
+            updateDuration();
+            setInterval(updateDuration, 60000); // Update every minute
+        }
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const table = document.getElementById('dataTable');
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = tbody.getElementsByTagName('tr');
+
+    function performSearch() {
+        const searchText = searchInput.value.toLowerCase();
+        for (let row of rows) {
+            const spotId = row.cells[0].textContent.toLowerCase();
+            const userName = row.cells[1].textContent.toLowerCase();
+            const vehicleNumber = row.cells[2].textContent.toLowerCase();
+            if (spotId.includes(searchText) || 
+                userName.includes(searchText) || 
+                vehicleNumber.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    }
+    searchInput.addEventListener('keyup', performSearch);
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+});
+</script>
+{% endblock %}

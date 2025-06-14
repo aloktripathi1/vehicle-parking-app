@@ -613,3 +613,169 @@ def has_active_booking(user_id):
     except Exception as e:
         print(f"Error checking active bookings: {e}")
         return False
+    
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    try:
+        # Get sort parameters from URL
+        sort_column = request.args.get('sort', 'signup_date')
+        sort_direction = request.args.get('direction', 'desc')
+        
+        # Validate sort column
+        valid_columns = {
+            'signup_date': User.created_at,
+            'total_bookings': func.count(Reservation.id),
+            'total_spent': func.coalesce(func.sum(Reservation.parking_cost), 0.0)
+        }
+        
+        if sort_column not in valid_columns:
+            sort_column = 'signup_date'
+        
+        # Build the query
+        query = db.session.query(
+            User,
+            func.count(Reservation.id).label('total_bookings'),
+            func.coalesce(func.sum(Reservation.parking_cost), 0.0).label('total_spent')
+        ).outerjoin(
+            Reservation, User.id == Reservation.user_id
+        ).group_by(
+            User.id
+        )
+        
+        # Apply sorting
+        sort_column_expr = valid_columns[sort_column]
+        if sort_direction == 'asc':
+            query = query.order_by(sort_column_expr.asc())
+        else:
+            query = query.order_by(sort_column_expr.desc())
+        
+        # Execute query
+        results = query.all()
+        
+        # Convert the query results to a list of user objects with additional attributes
+        users_with_stats = []
+        for user, total_bookings, total_spent in results:
+            user.total_bookings = total_bookings or 0
+            user.total_spent = total_spent or 0.0
+            users_with_stats.append(user)
+        
+        form = EditUserForm()
+        return render_template('admin_users.html', users=users_with_stats, form=form)
+    except Exception as e:
+        app.logger.error(f"Error in admin users: {str(e)}")
+        flash('An error occurred while loading users. Please try again.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/occupied_spots')
+@login_required
+def admin_occupied_spots():
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    try:
+        # Get current time in UTC for duration calculation
+        now = datetime.utcnow()
+        
+        # Get all occupied spots with their reservation details
+        occupied_spots = db.session.query(
+            ParkingSpot, ParkingLot, Reservation, User
+        ).join(
+            ParkingLot, ParkingSpot.lot_id == ParkingLot.id
+        ).join(
+            Reservation, ParkingSpot.id == Reservation.spot_id
+        ).join(
+            User, Reservation.user_id == User.id
+        ).filter(
+            ParkingSpot.status == 'O',
+            Reservation.leaving_timestamp.is_(None)
+        ).all() or []
+        
+        return render_template('admin_occupied_spots.html', occupied_spots=occupied_spots, now=now)
+    except Exception as e:
+        app.logger.error(f"Error in admin occupied spots: {str(e)}")
+        flash('An error occurred while loading occupied spots. Please try again.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/end_reservation/<int:spot_id>', methods=['POST'])
+@login_required
+def end_reservation(spot_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    # Get the spot and its current reservation
+    spot = ParkingSpot.query.get_or_404(spot_id)
+    reservation = Reservation.query.filter_by(spot_id=spot_id, leaving_timestamp=None).first()
+    
+    if not reservation:
+        flash('No active reservation found for this spot', 'warning')
+        return redirect(url_for('admin_occupied_spots'))
+    
+    # Get the parking lot for price calculation
+    lot = ParkingLot.query.get(spot.lot_id)
+    
+    # Calculate the duration and cost
+    now = datetime.now()
+    duration_hours = (now - reservation.parking_timestamp).total_seconds() / 3600
+    cost = round(duration_hours * lot.price, 2)
+    
+    # Update the reservation
+    reservation.leaving_timestamp = now
+    reservation.parking_cost = cost
+    
+    # Update the spot status
+    spot.status = 'A'  # Available
+    
+    db.session.commit()
+    
+    flash(f'Reservation ended successfully. Total cost: ₹{cost:.2f}', 'success')
+    return redirect(url_for('admin_occupied_spots'))
+
+@app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
+@login_required
+def edit_user(user_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    user = User.query.get_or_404(user_id)
+    form = EditUserForm()
+    
+    if form.validate_on_submit():
+        user.name = form.full_name.data
+        user.email = form.email.data
+        user.address = form.address.data
+        user.pincode = form.pincode.data
+        db.session.commit()
+        flash('User details updated successfully.', 'success')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'danger')
+    
+    return redirect(url_for('admin_users'))
+
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    user = User.query.get_or_404(user_id)
+    
+    # Delete all reservations associated with this user
+    Reservation.query.filter_by(user_id=user_id).delete()
+    
+    # Now delete the user
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash('User and their reservations deleted successfully.', 'success')
+    return redirect(url_for('admin_users'))
