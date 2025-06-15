@@ -85,7 +85,7 @@ The application will be available at `http://localhost:5000`
 ## Project Structure
 
 ```
-parking_app/
+parking_app_23f3003225/
 ├── app.py              # Main application file
 ├── models.py           # Database models
 ├── forms.py            # Form definitions
