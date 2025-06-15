@@ -1,73 +1,32 @@
-# ParkEase - Smart Parking Management System
+# Vehicle Parking App
 
-ParkEase is a modern web-based parking management system that helps users find, book, and manage parking spots efficiently. The system provides a user-friendly interface for both parking lot administrators and regular users.
+A multi-user 4-wheeler parking management system built with Flask and SQLite.  
+This project is part of **Modern Application Development I** at IITM.
 
-## Features
+## 👥 Roles
 
-### For Users
-- User registration and authentication
-- Real-time parking spot availability
-- Easy booking system
-- Parking history tracking
-- Cost analytics and statistics
-- Profile management
-- Dark/Light theme support
+- **Admin**: Superuser who can manage parking lots and view all spots/users.
+- **User**: Can register/login, reserve, park, and release spots.
 
-### For Administrators
-- Comprehensive dashboard with analytics
-- Parking lot management
-- User management
-- Revenue tracking
-- Occupied spots monitoring
-- Booking management
+## ⚙️ Tech Stack
 
-## Tech Stack
+- Flask (Python)
+- SQLite (Programmatic DB setup)
+- Jinja2 (Templating)
+- HTML/CSS/Bootstrap (Frontend)
+- Chart.js (Optional summary graphs)
 
-### Backend
-- Flask 2.0.1
-- Flask-Login 0.5.0
-- Flask-SQLAlchemy 3.0.2
-- Flask-WTF 0.15.1
-- SQLAlchemy 1.4.41
-- WTForms 2.3.3
-- Werkzeug 2.0.1
+## 🏁 How to Run
 
-### Frontend
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-- Bootstrap 5.3.0
-- Chart.js
-- Font Awesome 6.0.0
-- Google Fonts (Poppins, Montserrat, Open Sans)
-
-### Database
-- SQLite
-
-## Installation
-
-1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd parking_app
-```
-
-2. Create and activate a virtual environment:
-```bash
-# Windows
+# 1. Create virtual environment (optional but recommended)
 python -m venv venv
-venv\Scripts\activate
+source venv/bin/activate  # on Windows: venv\Scripts\activate
 
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. Install dependencies:
-```bash
+# 2. Install dependencies
 pip install -r requirements.txt
-```
 
+<<<<<<< HEAD
 4. Initialize the database:
 ```bash
 flask db init
@@ -161,3 +120,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Font Awesome for icons
 - Chart.js for data visualization
 - Flask community for the backend framework 
+=======
+# 3. Run the app
+python app.py
+>>>>>>> 1fb5553 (Update README.md)
