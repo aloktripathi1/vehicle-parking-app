@@ -155,13 +155,6 @@ parking_app/
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Contact
-
-For any queries or support, please contact:
-- Email: support@parkease.in
-- Phone: +91 77059-76390
-- Address: Tower B, Sector 63, Noida, UP – 201301
-
 ## Acknowledgments
 
 - Bootstrap for the frontend framework
