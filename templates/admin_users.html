@@ -60,6 +60,12 @@
         box-shadow: 0 0 0 0.2rem rgba(0, 96, 100, 0.1);
         outline: none;
     }
+    body[data-theme="light"] .search-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+    }
+    body[data-theme="dark"] .search-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+    }
     .search-icon {
         position: absolute;
         left: 0.75rem;
@@ -168,7 +174,7 @@
     .sort-dropdown {
         position: relative;
         display: inline-block;
-        z-index: 1060 !important;
+        z-index: 1050 !important;
     }
     .sort-dropdown-btn {
         background: var(--card-bg);
@@ -200,7 +206,7 @@
         min-width: 160px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         border-radius: var(--border-radius);
-        z-index: 1060 !important;
+        z-index: 1050 !important;
         border: 1px solid var(--border-color);
         margin-top: 0.3rem;
     }
@@ -228,131 +234,6 @@
     .sort-option.active {
         background: var(--primary-color);
         color: white;
-    }
-    .check-bookings-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        line-height: 1;
-        border-radius: 0.2rem;
-        transition: all 0.2s ease-in-out;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 28px;
-        width: 28px;
-    }
-    .check-bookings-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    #bookingsTable th {
-        white-space: nowrap;
-        padding: 0.75rem 1rem;
-    }
-    #bookingsTable td {
-        padding: 0.75rem 1rem;
-    }
-    #bookingsTable tbody tr:hover {
-        background-color: rgba(13, 110, 253, 0.05);
-    }
-    .modal-xl {
-        max-width: 1000px;
-    }
-    /* Fix modal positioning and z-index issues */
-    .modal {
-        z-index: 1050;
-    }
-    .modal-backdrop {
-        z-index: 1040;
-    }
-    /* Ensure dropdowns appear above modal */
-    .dropdown-menu {
-        z-index: 1060;
-    }
-    /* Fix table cell height for consistent alignment */
-    .table td {
-        height: 48px;
-        vertical-align: middle;
-    }
-    /* Sort button styling */
-    .sort-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        border-radius: 0.375rem;
-        transition: all 0.2s ease;
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #495057;
-    }
-    .sort-btn:hover {
-        background-color: #e9ecef;
-        border-color: #ced4da;
-        color: #212529;
-    }
-    .sort-btn:focus {
-        box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.15);
-    }
-    .dropdown-menu {
-        padding: 0.5rem 0;
-        border-radius: 0.375rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    .dropdown-item {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        color: #495057;
-        transition: all 0.15s ease;
-    }
-    .dropdown-item:hover {
-        background-color: #f8f9fa;
-        color: #212529;
-    }
-    .dropdown-item:active {
-        background-color: #e9ecef;
-        color: #212529;
-    }
-    /* Search input styling */
-    #searchInput {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-right: none;
-    }
-    #searchButton {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        padding: 0.5rem 1rem;
-    }
-    /* Ensure consistent spacing */
-    .input-group {
-        width: auto;
-        min-width: 250px;
-    }
-    /* Dark mode adjustments */
-    .dark-mode .sort-btn {
-        background-color: #2b3035;
-        border-color: #495057;
-        color: #e9ecef;
-    }
-    .dark-mode .sort-btn:hover {
-        background-color: #343a40;
-        border-color: #6c757d;
-        color: #fff;
-    }
-    .dark-mode .dropdown-menu {
-        background-color: #2b3035;
-        border-color: #495057;
-    }
-    .dark-mode .dropdown-item {
-        color: #e9ecef;
-    }
-    .dark-mode .dropdown-item:hover {
-        background-color: #343a40;
-        color: #fff;
-    }
-    .dark-mode .dropdown-item:active {
-        background-color: #495057;
-        color: #fff;
     }
 </style>
 <style>
@@ -394,13 +275,13 @@
     z-index: 2000 !important;
   }
   body[data-theme="dark"] .modal-backdrop {
-    z-index: 1050 !important;
+    z-index: 1999 !important;
   }
   body[data-theme="dark"] .sort-dropdown-content {
     background-color: #000000 !important;
     border-color: #2d3748 !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    z-index: 1060 !important;
+    z-index: 1050 !important;
   }
   body[data-theme="dark"] .sort-option {
     color: #ffffff !important;
@@ -422,21 +303,6 @@
     background-color: #1a202c !important;
     border-color: var(--primary-color) !important;
   }
-  body[data-theme="dark"] h2,
-  body[data-theme="dark"] .users-title,
-  body[data-theme="dark"] .card-header h2 {
-    color: #fff !important;
-  }
-  body[data-theme="dark"] .sort-btn {
-    background-color: #000 !important;
-    color: #fff !important;
-    border: 2px solid var(--color-primary, #0d6efd) !important;
-  }
-  body[data-theme="dark"] .sort-btn:hover {
-    background-color: #1a1a1a !important;
-    color: #fff !important;
-    border-color: var(--color-primary, #0d6efd) !important;
-  }
 </style>
 {% endblock %}
 
@@ -445,29 +311,10 @@
     <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0"><i class="fas fa-users me-2"></i>Users</h2>
-                <div class="d-flex align-items-center">
-                    <div class="dropdown me-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle sort-btn" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-sort me-1"></i>Sort By
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
-                            <li><a class="dropdown-item" href="#" data-sort="name">Name</a></li>
-                            <li><a class="dropdown-item" href="#" data-sort="email">Email</a></li>
-                            <li><a class="dropdown-item" href="#" data-sort="signup">Signup Date</a></li>
-                            <li><a class="dropdown-item" href="#" data-sort="bookings">Total Bookings</a></li>
-                            <li><a class="dropdown-item" href="#" data-sort="spent">Total Spent</a></li>
-                        </ul>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Search users...">
-                        <button class="btn btn-outline-secondary" type="button" id="searchButton">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <h2 class="fw-bold mb-2" style="color: var(--primary-color);">
+                <i class="fas fa-users me-2"></i>Manage Users
+            </h2>
+            <p class="text-muted dark-mode-text">View and manage all registered users</p>
         </div>
     </div>
 
@@ -479,10 +326,49 @@
                     <h5 class="mb-0 text-primary dark-mode-text">
                         <i class="fas fa-users me-2"></i>Registered Users
                     </h5>
+                    <div class="header-controls">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <i class="fas fa-spinner fa-spin loading-spinner"></i>
+                            <input type="text" id="searchInput" class="search-input" placeholder="Search by name or email">
+                        </div>
+                        <div class="sort-dropdown">
+                            <button class="sort-dropdown-btn" onclick="toggleSortDropdown()">
+                                <i class="fas fa-sort"></i>
+                                Sort By
+                            </button>
+                            <div class="sort-dropdown-content" id="sortDropdown">
+                                <div class="sort-option" data-sort="signup_date" data-direction="desc">
+                                    <i class="fas fa-calendar"></i>
+                                    Newest First
+                                </div>
+                                <div class="sort-option" data-sort="signup_date" data-direction="asc">
+                                    <i class="fas fa-calendar"></i>
+                                    Oldest First
+                                </div>
+                                <div class="sort-option" data-sort="total_bookings" data-direction="desc">
+                                    <i class="fas fa-calendar-check"></i>
+                                    Most Bookings
+                                </div>
+                                <div class="sort-option" data-sort="total_bookings" data-direction="asc">
+                                    <i class="fas fa-calendar-check"></i>
+                                    Least Bookings
+                                </div>
+                                <div class="sort-option" data-sort="total_spent" data-direction="desc">
+                                    <i class="fas fa-tag"></i>
+                                    Highest Spent
+                                </div>
+                                <div class="sort-option" data-sort="total_spent" data-direction="asc">
+                                    <i class="fas fa-tag"></i>
+                                    Lowest Spent
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body p-4">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table admin-table" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
                                     <th class="dark-mode-text">ID</th>
@@ -502,17 +388,13 @@
                                     <td class="dark-mode-text">{{ user.email }}</td>
                                     <td class="dark-mode-text">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                     <td class="dark-mode-text">
-                                        <div class="d-flex align-items-center h-100">
-                                            <span class="me-2">{{ user.total_bookings }}</span>
-                                            <button type="button" class="btn btn-sm btn-outline-primary check-bookings-btn" 
-                                                    data-user-id="{{ user.id }}"
-                                                    data-user-name="{{ user.name }}"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    title="View booking details">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
+                                        {{ user.total_bookings }}
+                                        <button type="button" class="btn btn-sm btn-info btn-action ms-2" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#reservationHistoryModal{{ user.id }}"
+                                                title="View Reservation History">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
                                     </td>
                                     <td class="dark-mode-text">₹{{ "%.2f"|format(user.total_spent) }}</td>
                                     <td>
@@ -626,219 +508,244 @@
         </div>
     </div>
 </div>
-{% endfor %}
 
-<!-- Past Bookings Modal -->
-<div class="modal fade" id="bookingsModal" tabindex="-1" aria-labelledby="bookingsModalLabel" aria-hidden="true" data-bs-backdrop="static">
+<!-- Reservation History Modal -->
+<div class="modal fade" id="reservationHistoryModal{{ user.id }}" tabindex="-1" aria-labelledby="reservationHistoryModalLabel{{ user.id }}" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title" id="bookingsModalLabel">
-                    <i class="fas fa-history me-2 text-primary"></i>
-                    <span id="bookingsModalUserName" class="fw-bold"></span> - Past Bookings
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservationHistoryModalLabel{{ user.id }}">
+                    <i class="fas fa-history me-2"></i>Reservation History - {{ user.name }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle" id="bookingsTable">
-                        <thead class="table-light">
+                    <table class="table table-hover reservation-history-table">
+                        <thead>
                             <tr>
-                                <th class="fw-semibold">Parking Lot</th>
-                                <th class="fw-semibold">Spot ID</th>
-                                <th class="fw-semibold">Start Time</th>
-                                <th class="fw-semibold">End Time</th>
-                                <th class="fw-semibold">Cost</th>
+                                <th class="min-width-150">Parking Lot</th>
+                                <th class="min-width-80">Spot ID</th>
+                                <th class="min-width-100">Vehicle No</th>
+                                <th class="min-width-150">Parked At</th>
+                                <th class="min-width-150">Left At</th>
+                                <th class="min-width-120">Duration</th>
+                                <th class="min-width-100">Cost</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- Bookings will be loaded dynamically -->
+                        <tbody id="reservationHistoryTableBody{{ user.id }}">
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="modal-footer bg-light">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+{% endfor %}
 
-<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<style>
+.modal-xl {
+    max-width: 85%;
+}
+
+.reservation-history-table th,
+.reservation-history-table td {
+    white-space: nowrap;
+    padding: 0.75rem;
+}
+
+.min-width-80 {
+    min-width: 80px;
+}
+
+.min-width-100 {
+    min-width: 100px;
+}
+
+.min-width-120 {
+    min-width: 120px;
+}
+
+.min-width-150 {
+    min-width: 150px;
+}
+
+@media (max-width: 1400px) {
+    .modal-xl {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 992px) {
+    .modal-xl {
+        max-width: 95%;
+    }
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    const searchInput = document.getElementById('searchInput');
+    const searchContainer = document.querySelector('.search-container');
+    const tableBody = document.querySelector('tbody');
+    let searchTimeout;
 
-    // Initialize bookings modal
-    const bookingsModal = new bootstrap.Modal(document.getElementById('bookingsModal'), {
-        backdrop: 'static',
-        keyboard: false
-    });
-    
-    // Handle check bookings button clicks
-    document.querySelectorAll('.check-bookings-btn').forEach(button => {
-        button.addEventListener('click', async function() {
-            const userId = this.dataset.userId;
-            const userName = this.dataset.userName;
+    // Function to update table with search results
+    function updateTable(users) {
+        tableBody.innerHTML = users.map(user => `
+            <tr>
+                <td class="dark-mode-text">${user.id}</td>
+                <td class="dark-mode-text">${user.name}</td>
+                <td class="dark-mode-text">${user.email}</td>
+                <td class="dark-mode-text">${user.created_at}</td>
+                <td class="dark-mode-text">${user.total_bookings}</td>
+                <td class="dark-mode-text">₹${user.total_spent.toFixed(2)}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-sm btn-primary btn-action" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#viewUserModal${user.id}"
+                                title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger btn-action" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteUserModal${user.id}"
+                                title="Delete User">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Function to perform search
+    async function performSearch(query) {
+        try {
+            searchContainer.classList.add('loading');
             
-            // Update modal title
-            document.getElementById('bookingsModalUserName').textContent = userName;
+            // Get current sort parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const sort = urlParams.get('sort') || 'signup_date';
+            const direction = urlParams.get('direction') || 'desc';
             
-            try {
-                // Fetch bookings data
-                const response = await fetch(`/api/user/${userId}/loopings`);
+            // Make API request
+            const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&sort=${sort}&direction=${direction}`);
             const data = await response.json();
             
             if (data.success) {
-                    // Clear existing table rows
-                    const tbody = document.querySelector('#bookingsTable tbody');
-                    tbody.innerHTML = '';
-                    
-                    // Add new rows
-                    data.loopings.forEach(booking => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${booking.parking_lot_name}</td>
-                            <td>${booking.spot_id}</td>
-                            <td class="timestamp" data-utc="${booking.start_time}"></td>
-                            <td class="timestamp" data-utc="${booking.end_time}"></td>
-                            <td>₹${booking.cost ? booking.cost.toFixed(2) : '-'}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                    
-                    // Convert timestamps to IST
-                    tbody.querySelectorAll('.timestamp').forEach(element => {
-                        const utcDate = element.getAttribute('data-utc');
-                        if (utcDate) {
-                            element.textContent = TimeUtils.convertUTCtoIST(utcDate);
-                        } else {
-                            element.textContent = '-';
-                        }
-                    });
-                    
-                    // Show modal
-                    bookingsModal.show();
+                updateTable(data.users);
             } else {
-                    alert('Failed to load bookings data. Please try again.');
+                console.error('Search failed:', data.error);
             }
         } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while loading bookings data.');
-            }
-        });
-    });
-
-    // Sort functionality
-    const sortDropdown = document.getElementById('sortDropdown');
-    const dropdownItems = document.querySelectorAll('.dropdown-item[data-sort]');
-    let currentSort = {
-        column: null,
-        direction: 'asc'
-    };
-    
-    dropdownItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const sortBy = this.dataset.sort;
-            
-            // Toggle sort direction if clicking the same column
-            if (currentSort.column === sortBy) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = sortBy;
-                currentSort.direction = 'asc';
-            }
-            
-            // Update button text and icon
-            const buttonText = this.textContent;
-            const sortIcon = currentSort.direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
-            sortDropdown.innerHTML = `<i class="fas ${sortIcon} me-1"></i>${buttonText}`;
-            
-            // Sort the table
-            const tbody = document.querySelector('table tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            
-            rows.sort((a, b) => {
-                let aVal, bVal;
-                
-                switch(sortBy) {
-                    case 'name':
-                        aVal = a.cells[1].textContent.toLowerCase();
-                        bVal = b.cells[1].textContent.toLowerCase();
-                        break;
-                    case 'email':
-                        aVal = a.cells[2].textContent.toLowerCase();
-                        bVal = b.cells[2].textContent.toLowerCase();
-                        break;
-                    case 'signup':
-                        aVal = new Date(a.cells[3].textContent);
-                        bVal = new Date(b.cells[3].textContent);
-                        break;
-                    case 'bookings':
-                        aVal = parseInt(a.cells[4].querySelector('span').textContent) || 0;
-                        bVal = parseInt(b.cells[4].querySelector('span').textContent) || 0;
-                        break;
-                    case 'spent':
-                        aVal = parseFloat(a.cells[5].textContent.replace('₹', '')) || 0;
-                        bVal = parseFloat(b.cells[5].textContent.replace('₹', '')) || 0;
-                        break;
-                }
-                
-                if (currentSort.direction === 'asc') {
-                    return aVal > bVal ? 1 : -1;
-                } else {
-                    return aVal < bVal ? 1 : -1;
-                }
-            });
-            
-            // Reorder the rows
-            tbody.innerHTML = '';
-            rows.forEach(row => tbody.appendChild(row));
-        });
-    });
-
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const searchButton = document.getElementById('searchButton');
-    const table = document.querySelector('table');
-    const rows = table.querySelectorAll('tbody tr');
-
-    function performSearch() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        
-        rows.forEach(row => {
-            const name = row.cells[1].textContent.toLowerCase();
-            const email = row.cells[2].textContent.toLowerCase();
-            const signupDate = row.cells[3].textContent.toLowerCase();
-            const bookings = row.cells[4].textContent.toLowerCase();
-            const spent = row.cells[5].textContent.toLowerCase();
-            
-            const matches = name.includes(searchTerm) || 
-                          email.includes(searchTerm) || 
-                          signupDate.includes(searchTerm) || 
-                          bookings.includes(searchTerm) || 
-                          spent.includes(searchTerm);
-            
-            row.style.display = matches ? '' : 'none';
-        });
+            console.error('Search error:', error);
+        } finally {
+            searchContainer.classList.remove('loading');
+        }
     }
 
-    // Search on input change
-    searchInput.addEventListener('input', performSearch);
-
-    // Search on button click
-    searchButton.addEventListener('click', performSearch);
-
-    // Search on Enter key
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            performSearch();
+    // Add input event listener with debounce
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        
+        if (query.length >= 2) {
+            searchTimeout = setTimeout(() => performSearch(query), 300);
+        } else if (query.length === 0) {
+            // Reset to initial state if search is cleared
+            const url = new URL(window.location.href);
+            url.searchParams.delete('q');
+            window.location.href = url.toString();
         }
+    });
+
+    const sortDropdown = document.getElementById('sortDropdown');
+    const sortOptions = sortDropdown.querySelectorAll('.sort-option');
+    
+    // Get current sort from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSort = urlParams.get('sort') || 'signup_date';
+    const currentDirection = urlParams.get('direction') || 'desc';
+    
+    // Set active sort option
+    sortOptions.forEach(option => {
+        if (option.dataset.sort === currentSort && option.dataset.direction === currentDirection) {
+            option.classList.add('active');
+        }
+        
+        option.addEventListener('click', () => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('sort', option.dataset.sort);
+            url.searchParams.set('direction', option.dataset.direction);
+            window.location.href = url.toString();
+        });
+    });
+
+    // Handle reservation history modal
+    const reservationModals = document.querySelectorAll('[id^="reservationHistoryModal"]');
+    reservationModals.forEach(modal => {
+        modal.addEventListener('show.bs.modal', async function() {
+            const userId = this.id.replace('reservationHistoryModal', '');
+            const tableBody = document.getElementById(`reservationHistoryTableBody${userId}`);
+            
+            try {
+                const response = await fetch(`/api/admin/user/${userId}/reservations`);
+                const data = await response.json();
+                
+                if (data.reservations) {
+                    if (data.reservations.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    No reservation history found
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        tableBody.innerHTML = data.reservations.map(reservation => `
+                            <tr>
+                                <td>${reservation.parking_lot}</td>
+                                <td>${reservation.spot_id}</td>
+                                <td>${reservation.vehicle_number}</td>
+                                <td>${reservation.parked_at || 'N/A'}</td>
+                                <td>${reservation.left_at || 'N/A'}</td>
+                                <td>${reservation.duration || 'N/A'}</td>
+                                <td>${reservation.cost || 'N/A'}</td>
+                            </tr>
+                        `).join('');
+                    }
+                } else {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center text-danger">
+                                Failed to load reservation history
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error fetching reservations:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-danger">
+                            Error loading reservation history
+                        </td>
+                    </tr>
+                `;
+            }
+        });
     });
 });
 

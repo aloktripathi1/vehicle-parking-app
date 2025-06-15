@@ -1,0 +1,131 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Admin Table Styles */
+.admin-table-container {
+    width: 98%;
+    max-width: 1400px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+}
+
+.admin-table-card {
+    border-radius: var(--border-radius);
+    border: 1.5px solid #d1d5db;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.2s;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.admin-table-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18) !important;
+    border-color: var(--primary-color);
+}
+
+.admin-table-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--light-bg);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    padding: 1.25rem 2rem;
+}
+
+.admin-table-body {
+    padding: 0;
+}
+
+.admin-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.admin-table th {
+    font-weight: 600;
+    color: var(--text-color);
+    background: var(--light-bg);
+    white-space: nowrap;
+    padding: 1rem 0.75rem;
+    letter-spacing: 0.02em;
+    font-size: 1.1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.admin-table td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.01em;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+.admin-table .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.admin-table .btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+}
+
+.admin-table .address-col {
+    white-space: normal !important;
+    max-width: 220px;
+    word-break: break-word;
+}
+
+/* Dark mode support */
+body[data-theme="dark"] .admin-table th,
+body[data-theme="dark"] .admin-table td {
+    background-color: var(--table-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+body[data-theme="dark"] .admin-table tbody tr:hover {
+    background-color: var(--dark-hover-bg) !important;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .admin-table-container {
+        padding: 0 1rem;
+    }
+    
+    .admin-table-header {
+        padding: 1rem;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 0.75rem;
+    }
+    
+    .admin-table .address-col {
+        text-align: right !important;
+    }
+    
+    .admin-table .action-buttons {
+        justify-content: flex-end;
+    }
+} 

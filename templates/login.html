@@ -224,6 +224,102 @@
             opacity: 0.95;
         }
 
+        /* ENHANCED PASSWORD TOGGLE STYLES - FIXED */
+        
+        /* Hide ALL browser default password toggles */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            visibility: hidden !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            right: 0 !important;
+            display: none !important;
+        }
+
+        input[type="text"]::-webkit-credentials-auto-fill-button {
+            visibility: hidden !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            right: 0 !important;
+            display: none !important;
+        }
+
+        /* Firefox */
+        input[type="password"]::-moz-reveal {
+            display: none !important;
+        }
+
+        /* Password input group container */
+        .password-input-group {
+            position: relative;
+            display: flex;
+            width: 100%;
+        }
+
+        /* Password input styling */
+        .password-input-group .form-control {
+            padding-right: 2.75rem !important;
+            border-right: 1px solid var(--border-color) !important;
+        }
+
+        .password-input-group .input-group-text {
+            border-right: none;
+        }
+
+        /* Custom password toggle button */
+        .password-toggle {
+            position: absolute !important;
+            right: 1px !important;
+            top: 1px !important;
+            bottom: 1px !important;
+            width: 42px !important;
+            height: calc(100% - 2px) !important;
+            background: var(--input-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-left: none !important;
+            border-radius: 0 0.375rem 0.375rem 0 !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: var(--text-muted) !important;
+            transition: all 0.2s ease !important;
+            z-index: 10 !important;
+            outline: none !important;
+        }
+
+        .password-toggle:hover {
+            color: var(--text-color) !important;
+            background: var(--input-bg) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        .password-toggle:focus {
+            color: var(--text-color) !important;
+            background: var(--input-bg) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: none !important;
+        }
+
+        /* Input group layout */
+        .input-group {
+            width: 100%;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .input-group .form-control {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+        }
+
         @media (max-width: 991.98px) {
             .split-screen {
                 flex-direction: column;
@@ -260,63 +356,6 @@
             .right-content h2 {
                 font-size: 1.75rem;
             }
-        }
-
-        .input-group {
-            width: 100%;
-            display: flex;
-            align-items: stretch;
-        }
-
-        .input-group .form-control {
-            flex: 1;
-            min-width: 0;
-            width: 100%;
-        }
-
-        .input-group .btn-outline-secondary {
-            flex-shrink: 0;
-            width: 42px;
-        }
-
-        /* Hide all default password toggle icons */
-        input[type="password"]::-ms-reveal,
-        input[type="password"]::-ms-clear,
-        input[type="password"]::-webkit-credentials-auto-fill-button,
-        input[type="password"]::-moz-password-toggle,
-        input[type="password"]::-webkit-password-toggle-button {
-            display: none !important;
-        }
-
-        /* Ensure custom password toggle is always visible */
-        .password-toggle {
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: color 0.2s ease;
-        }
-
-        .password-toggle:hover {
-            color: var(--text-color);
-        }
-
-        /* Style the password input group */
-        .password-input-group {
-            position: relative;
-        }
-
-        .password-input-group .form-control {
-            padding-right: 2.5rem;
-        }
-
-        .password-input-group .password-toggle {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            background: transparent;
-            border: none;
-            padding: 0;
         }
     </style>
 </head>
@@ -357,10 +396,10 @@
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <div class="input-group">
+                        <div class="input-group password-input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
                             {{ form.password(class="form-control", placeholder="Enter your password", id="passwordInput", autocomplete="current-password") }}
-                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" tabindex="-1">
+                            <button class="password-toggle" type="button" id="togglePassword" tabindex="-1">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -378,7 +417,6 @@
                             {{ form.remember(class="form-check-input") }}
                             <label class="form-check-label" for="remember">Remember me</label>
                         </div>
-                        <a href="#" class="auth-link">Forgot password?</a>
                     </div>
 
                     <div class="d-grid">
@@ -413,11 +451,26 @@
             const passwordInput = document.getElementById('passwordInput');
             
             if (togglePassword && passwordInput) {
-                togglePassword.addEventListener('click', function() {
+                togglePassword.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
                     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                     passwordInput.setAttribute('type', type);
-                    this.querySelector('i').classList.toggle('fa-eye');
-                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                    
+                    const icon = this.querySelector('i');
+                    if (type === 'password') {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    } else {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    }
+                });
+                
+                // Prevent form submission when clicking toggle
+                togglePassword.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
                 });
             }
         });
