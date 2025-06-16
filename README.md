@@ -26,6 +26,9 @@ source venv/bin/activate  # on Windows: venv\Scripts\activate
 # 2. Install dependencies
 pip install -r requirements.txt
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0c1095b (UI UX polishing, fixed bugs and improve ux)
 # 3. Run the app
 python app.py

@@ -452,7 +452,7 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item me-3">
                         <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
-                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-adjust"></i>
                         </button>
                     </li>
                     {% if current_user.is_authenticated %}
@@ -629,10 +629,10 @@
         const savedTheme = localStorage.getItem('theme') || 'light';
         if (savedTheme === 'dark') {
             document.body.setAttribute('data-theme', 'dark');
-            icon.classList.replace('fa-moon', 'fa-sun');
+            icon.classList.replace('fa-adjust', 'fa-sun');
         } else {
             document.body.removeAttribute('data-theme');
-            icon.classList.replace('fa-sun', 'fa-moon');
+            icon.classList.replace('fa-sun', 'fa-adjust');
         }
         
         themeToggle.addEventListener('click', () => {
@@ -640,11 +640,11 @@
             if (currentTheme === 'dark') {
                 document.body.removeAttribute('data-theme');
                 localStorage.setItem('theme', 'light');
-                icon.classList.replace('fa-sun', 'fa-moon');
+                icon.classList.replace('fa-sun', 'fa-adjust');
             } else {
                 document.body.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
-                icon.classList.replace('fa-moon', 'fa-sun');
+                icon.classList.replace('fa-adjust', 'fa-sun');
             }
             // Dispatch theme change event for components that need to update
             document.dispatchEvent(new Event('themeChanged'));

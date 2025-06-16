@@ -366,18 +366,28 @@ def book_spot():
                 'message': 'Access denied'
             })
         
-        # Check if user has completed their profile
-        if not current_user.address or not current_user.pincode:
+        # Get form data first to fail fast if missing
+        lot_id = request.form.get('lot_id')
+        vehicle_number = request.form.get('vehicle_number')
+        
+        if not lot_id or not vehicle_number:
             return jsonify({
                 'success': False,
-                'message': 'Please complete your profile before booking a spot.'
+                'message': 'Please provide all required information.'
             })
         
-        # Check for active bookings
+        # Check profile completion and active bookings in parallel
+        profile_complete = bool(current_user.address and current_user.pincode)
         active_reservation = Reservation.query.filter_by(
             user_id=current_user.id,
             leaving_timestamp=None
         ).first()
+        
+        if not profile_complete:
+            return jsonify({
+                'success': False,
+                'message': 'Please complete your profile before booking a spot.'
+            })
         
         if active_reservation:
             return jsonify({
@@ -385,18 +395,7 @@ def book_spot():
                 'message': 'You already have an active booking.'
             })
         
-        # Get form data
-        lot_id = request.form.get('lot_id')
-        vehicle_number = request.form.get('vehicle_number')
-        
-        # Validate required fields
-        if not lot_id or not vehicle_number:
-            return jsonify({
-                'success': False,
-                'message': 'Please provide all required information.'
-            })
-        
-        # Get parking lot
+        # Get parking lot and spot in a single query
         parking_lot = ParkingLot.query.get(lot_id)
         if not parking_lot:
             return jsonify({
@@ -404,7 +403,6 @@ def book_spot():
                 'message': 'Invalid parking lot selected.'
             })
         
-        # Find the first available spot
         spot = ParkingSpot.query.filter_by(
             lot_id=lot_id,
             status='A'
@@ -416,29 +414,30 @@ def book_spot():
                 'message': 'No available spots in this parking lot.'
             })
         
-        # Create reservation
-        reservation = Reservation(
-            user_id=current_user.id,
-            spot_id=spot.id,
-            vehicle_number=vehicle_number,
-            parking_timestamp=datetime.utcnow()
-        )
-        
-        # Update spot status
-        spot.status = 'O'  # Occupied
-        
-        # Save changes
-        db.session.add(reservation)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Booking successful!'
-        })
+        # Create reservation and update spot in a single transaction
+        try:
+            reservation = Reservation(
+                user_id=current_user.id,
+                spot_id=spot.id,
+                vehicle_number=vehicle_number,
+                parking_timestamp=datetime.utcnow()
+            )
+            spot.status = 'O'  # Occupied
+            
+            db.session.add(reservation)
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Booking successful!'
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            raise e
         
     except Exception as e:
         app.logger.error(f"Error creating booking: {str(e)}\n{traceback.format_exc()}")
-        db.session.rollback()
         return jsonify({
             'success': False,
             'message': 'An error occurred while creating the booking.'

@@ -476,7 +476,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const result = await response.json();
             if (result.success) {
-                // Show success message
+                // Hide modal immediately without animation
+                bookModal.hide();
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                
+                // Show success message and redirect immediately
                 const successAlert = document.createElement('div');
                 successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
                 successAlert.style.zIndex = '9999';
@@ -487,10 +493,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 document.body.appendChild(successAlert);
                 
-                // Redirect after a short delay
-                setTimeout(() => {
-                    window.location.href = '/user/dashboard';
-                }, 1500);
+                // Redirect immediately
+                window.location.href = '/user/dashboard';
             } else {
                 showErrorMessage(result.message || 'Failed to book parking spot. Please try again.');
                 bookModal.hide();

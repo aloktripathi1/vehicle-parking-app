@@ -356,7 +356,7 @@ body[data-theme="dark"] .reservation-details i {
 <!-- End Reservation Modals -->
 {% for spot, lot, reservation, user in occupied_spots %}
 <div class="modal fade" id="endReservationModal{{ spot.id }}" tabindex="-1" aria-labelledby="endReservationModalLabel{{ spot.id }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
         <div class="modal-content">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold" id="endReservationModalLabel{{ spot.id }}">
@@ -365,32 +365,32 @@ body[data-theme="dark"] .reservation-details i {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-3">
-                <p class="mb-4">Are you sure you want to end this reservation? This action cannot be undone.</p>
+                <p class="mb-3">Are you sure you want to end this reservation? This action cannot be undone.</p>
                 <div class="reservation-details">
-                    <p>
-                        <i class="fas fa-hashtag"></i>
-                        <strong>Spot ID:</strong> {{ spot.id }}
-                    </p>
-                    <p>
-                        <i class="fas fa-user"></i>
-                        <strong>User:</strong> {{ user.name }} ({{ user.username }})
-                    </p>
-                    <p>
-                        <i class="fas fa-car"></i>
-                        <strong>Vehicle Number:</strong> {{ reservation.vehicle_number }}
-                    </p>
-                    <p>
-                        <i class="fas fa-clock"></i>
-                        <strong>Parked Since:</strong> {{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}
-                    </p>
-                    <p>
-                        <i class="fas fa-map-marker-alt"></i>
-                        <strong>Location:</strong> {{ lot.prime_location_name }}
-                    </p>
-                    <p>
-                        <i class="fas fa-tag"></i>
-                        <strong>Rate:</strong> ₹{{ lot.price }}/hr
-                    </p>
+                    <div class="detail-item">
+                        <label>Spot ID:</label>
+                        <span>{{ spot.id }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>User:</label>
+                        <span>{{ user.name }} ({{ user.username }})</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Vehicle:</label>
+                        <span>{{ reservation.vehicle_number }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Parked Since:</label>
+                        <span>{{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Location:</label>
+                        <span>{{ lot.prime_location_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Rate:</label>
+                        <span>₹{{ lot.price }}/hr</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
@@ -405,6 +405,35 @@ body[data-theme="dark"] .reservation-details i {
     </div>
 </div>
 {% endfor %}
+
+<style>
+.reservation-details {
+    background-color: var(--card-bg);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.reservation-details .detail-item {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+}
+
+.reservation-details .detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.reservation-details label {
+    color: var(--text-muted);
+    min-width: 100px;
+    margin-right: 1rem;
+}
+
+.reservation-details span {
+    color: var(--text-color);
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
