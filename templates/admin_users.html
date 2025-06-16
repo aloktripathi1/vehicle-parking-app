@@ -401,7 +401,7 @@
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-sm btn-primary btn-action" 
                                                     data-bs-toggle="modal" 
-                                                    data-bs-target="#viewUserModal{{ user.id }}"
+                                                    data-bs-target="#userDetailsModal{{ user.id }}"
                                                     title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
@@ -424,51 +424,54 @@
     </div>
 </div>
 
-<!-- View User Modals -->
+<!-- User Details Modal -->
 {% for user in users %}
-<div class="modal fade" id="viewUserModal{{ user.id }}" tabindex="-1" aria-labelledby="viewUserModalLabel{{ user.id }}" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="userDetailsModal{{ user.id }}" tabindex="-1" aria-labelledby="userDetailsModalLabel{{ user.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 700px;">
         <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="viewUserModalLabel{{ user.id }}">
-                    <i class="fas fa-user me-2 text-primary"></i>User Details
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailsModalLabel{{ user.id }}">
+                    <i class="fas fa-user me-2"></i>User Details - {{ user.name }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body pt-3">
-                <div class="booking-details mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-user text-primary me-2"></i>
-                        <span class="dark-mode-text">{{ user.name }}</span>
+            <div class="modal-body">
+                <div class="user-details">
+                    <div class="detail-item">
+                        <label>Username:</label>
+                        <span>{{ user.username }}</span>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-at text-primary me-2"></i>
-                        <span class="dark-mode-text">{{ user.username }}</span>
+                    <div class="detail-item">
+                        <label>Email:</label>
+                        <span>{{ user.email }}</span>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-envelope text-primary me-2"></i>
-                        <span class="dark-mode-text">{{ user.email }}</span>
+                    <div class="detail-item">
+                        <label>Address:</label>
+                        <span>{{ user.address or 'Not provided' }}</span>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                        <span class="dark-mode-text">{{ user.address }}</span>
+                    <div class="detail-item">
+                        <label>Pincode:</label>
+                        <span>{{ user.pincode or 'Not provided' }}</span>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-map-pin text-primary me-2"></i>
-                        <span class="dark-mode-text">{{ user.pincode }}</span>
+                    <div class="detail-item">
+                        <label>Total Bookings:</label>
+                        <span>{{ user.total_bookings }}</span>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-calendar-check text-primary me-2"></i>
-                        <span class="dark-mode-text">Total Bookings: {{ user.total_bookings }}</span>
+                    <div class="detail-item">
+                        <label>Total Spent:</label>
+                        <span>₹{{ user.total_spent }}</span>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-tag text-primary me-2"></i>
-                        <span class="dark-mode-text">Total Spent: ₹{{ "%.2f"|format(user.total_spent) }}</span>
+                    <div class="detail-item">
+                        <label>Joined Date:</label>
+                        <span>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reservationHistoryModal{{ user.id }}">
+                    <i class="fas fa-history me-2"></i>View History
+                </button>
             </div>
         </div>
     </div>
@@ -591,6 +594,30 @@
         max-width: 95%;
     }
 }
+
+.user-details {
+    padding: 1rem;
+}
+
+.user-details .detail-item {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+}
+
+.user-details .detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.user-details label {
+    color: var(--text-muted);
+    min-width: 100px;
+    margin-right: 1rem;
+}
+
+.user-details span {
+    color: var(--text-color);
+}
 </style>
 
 <script>
@@ -614,7 +641,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="action-buttons">
                         <button type="button" class="btn btn-sm btn-primary btn-action" 
                                 data-bs-toggle="modal" 
-                                data-bs-target="#viewUserModal${user.id}"
+                                data-bs-target="#userDetailsModal${user.id}"
                                 title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
