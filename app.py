@@ -14,7 +14,7 @@ from sqlalchemy import or_
 import traceback
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-please-change-in-production')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'My name is Alok, and i am a student !!')
 
 # Ensure the instance folder exists
 try:
