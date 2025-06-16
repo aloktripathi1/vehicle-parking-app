@@ -56,7 +56,7 @@ class ParkingLot(db.Model):
     prime_location_name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)  # Price per hour
     address = db.Column(db.String(200), nullable=False)
-    pincode = db.Column(db.String(10), nullable=False)
+    pincode = db.Column(db.Integer, nullable=False)
     max_spots = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     

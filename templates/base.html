@@ -527,7 +527,7 @@
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
             <div class="modal-content">
-                <form method="POST" action="{{ url_for('edit_profile') }}">
+                <form id="editProfileForm" method="POST" action="{{ url_for('edit_profile') }}">
                     <div class="modal-header border-0 pb-0">
                         <h5 class="modal-title fw-bold" id="editProfileModalLabel">
                             <i class="fas fa-user-edit me-2 text-primary"></i>Edit Profile
@@ -535,31 +535,42 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body pt-3">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label for="profileName" class="form-label small text-muted">Full Name</label>
-                                <input type="text" class="form-control" id="profileName" name="name" value="{{ current_user.name }}" required>
-                            </div>
-                            <div class="col-12">
-                                <label for="profileEmail" class="form-label small text-muted">Email</label>
-                                <input type="email" class="form-control" id="profileEmail" name="email" value="{{ current_user.email }}" required>
-                            </div>
-                            <div class="col-12">
-                                <label for="profileAddress" class="form-label small text-muted">Address <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="profileAddress" name="address" value="{{ current_user.address }}" required>
-                                <small class="form-text text-muted">Required for booking parking spots</small>
-                            </div>
-                            <div class="col-12">
-                                <label for="profilePincode" class="form-label small text-muted">Pincode <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="profilePincode" name="pincode" value="{{ current_user.pincode }}" required>
-                                <small class="form-text text-muted">Required for booking parking spots</small>
-                            </div>
+                        <!-- Success Message -->
+                        <div id="profileUpdateSuccess" class="alert alert-success d-none mb-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span>Profile updated successfully!</span>
+                        </div>
+                        
+                        <!-- Error Message -->
+                        <div id="profileUpdateError" class="alert alert-danger d-none mb-3">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <span></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="profileName" class="form-label small text-muted">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="profileName" name="name" value="{{ current_user.name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="profileEmail" class="form-label small text-muted">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="profileEmail" name="email" value="{{ current_user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="profileAddress" class="form-label small text-muted">Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="profileAddress" name="address" rows="2" required>{{ current_user.address }}</textarea>
+                            <small class="form-text text-muted">Required for booking parking spots</small>
+                        </div>
+                        <div class="mb-0">
+                            <label for="profilePincode" class="form-label small text-muted">Pin Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="profilePincode" name="pincode" value="{{ current_user.pincode }}" pattern="[0-9]{6}" maxlength="6" required>
+                            <small class="form-text text-muted">Enter a 6-digit pin code</small>
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-check-circle me-2"></i>Save Changes
+                        <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                            <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
+                            Save Changes
                         </button>
                     </div>
                 </form>

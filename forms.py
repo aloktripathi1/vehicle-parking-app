@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FloatField, IntegerField, SelectField, BooleanField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, ValidationError, Regexp
 from models import User, Admin
 
 class LoginForm(FlaskForm):
@@ -74,7 +74,10 @@ class ParkingLotForm(FlaskForm):
     prime_location_name = StringField('Location Name', validators=[DataRequired()])
     price = FloatField('Price per Hour', validators=[DataRequired(), NumberRange(min=0.1)])
     address = StringField('Address', validators=[DataRequired()])
-    pincode = StringField('Pincode', validators=[DataRequired(), Length(min=5, max=10)])
+    pincode = IntegerField('Pincode', validators=[
+        DataRequired(),
+        NumberRange(min=100000, max=999999, message='Pincode must be a 6-digit number')
+    ])
     max_spots = IntegerField('Maximum Spots', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField('Submit')
 
@@ -88,9 +91,12 @@ class EditUserForm(FlaskForm):
         Email()
     ])
     address = StringField('Address', validators=[
+        DataRequired(),
         Length(min=5, max=200)
     ])
     pincode = StringField('Pincode', validators=[
-        Length(min=5, max=10)
+        DataRequired(),
+        Length(min=6, max=6),
+        Regexp(r'^\d{6}$', message='Pincode must be a 6-digit number')
     ])
     submit = SubmitField('Save Changes')

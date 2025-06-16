@@ -48,6 +48,8 @@ with app.app_context():
         db.session.add(admin)
         db.session.commit()
 
+# -------------------- Utility / Error Handling / Misc --------------------
+
 @app.errorhandler(500)
 def internal_error(error):
     app.logger.error('Server Error: %s', (traceback.format_exc()))
@@ -58,6 +60,21 @@ def load_user(user_id):
     if session.get('user_type') == 'admin':
         return Admin.query.get(int(user_id))
     return User.query.get(int(user_id))
+
+def has_active_booking(user_id):
+    """Check if user has any active bookings"""
+    try:
+        active_statuses = ['active', 'booked', 'in-progress']
+        active_booking = Reservation.query.filter(
+            Reservation.user_id == user_id,
+            Reservation.status.in_(active_statuses)
+        ).first()
+        return active_booking is not None
+    except Exception as e:
+        print(f"Error checking active bookings: {e}")
+        return False
+
+# -------------------- Main Routes (Login, Register, Home) --------------------
 
 @app.route('/')
 def index():
@@ -135,104 +152,7 @@ def logout():
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
 
-@app.route('/admin/dashboard')
-@login_required
-def admin_dashboard():
-    if session.get('user_type') != 'admin':
-        flash('Access denied', 'danger')
-        return redirect(url_for('index'))
-    
-    try:
-        parking_lots = ParkingLot.query.all()
-        total_spots = ParkingSpot.query.count()
-        occupied_spots = ParkingSpot.query.filter_by(status='O').count()
-        available_spots = total_spots - occupied_spots
-        users = User.query.count()
-        
-        # Get today's date at midnight
-        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        yesterday = today - timedelta(days=1)
-        
-        # Calculate today's revenue
-        today_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
-            .filter(Reservation.leaving_timestamp >= today,
-                    Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
-        
-        # Calculate yesterday's revenue
-        yesterday_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
-            .filter(Reservation.leaving_timestamp >= yesterday,
-                    Reservation.leaving_timestamp < today,
-                    Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
-        
-        # Calculate revenue change
-        revenue_change = today_revenue - yesterday_revenue
-        revenue_change_percent = (revenue_change / yesterday_revenue * 100) if yesterday_revenue > 0 else 0
-        
-        # Calculate new users today
-        new_users_today = User.query.filter(User.created_at >= today).count()
-        new_users_yesterday = User.query.filter(
-            User.created_at >= yesterday,
-            User.created_at < today
-        ).count()
-        
-        # Calculate user change
-        user_change = new_users_today - new_users_yesterday
-        user_change_percent = (user_change / new_users_yesterday * 100) if new_users_yesterday > 0 else 0
-        
-        # Calculate spot changes
-        occupied_spots_yesterday = ParkingSpot.query.filter_by(status='O').count()
-        spot_change = occupied_spots - occupied_spots_yesterday
-        
-        # Total revenue calculations
-        total_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
-            .filter(Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
-        
-        # Prepare data for charts
-        lot_data = []
-        for lot in parking_lots:
-            # Get revenue for this lot
-            lot_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
-                .join(ParkingSpot, Reservation.spot_id == ParkingSpot.id)\
-                .filter(ParkingSpot.lot_id == lot.id,
-                        Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
-            
-            # Get spot counts
-            total_lot_spots = ParkingSpot.query.filter_by(lot_id=lot.id).count()
-            occupied_lot_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='O').count()
-            
-            lot_data.append({
-                'name': lot.prime_location_name,
-                'revenue': lot_revenue,
-                'total_spots': total_lot_spots,
-                'occupied_spots': occupied_lot_spots
-            })
-        
-        # Prepare chart data
-        chart_data = {
-            'lot_data': lot_data
-        }
-        
-        return render_template('admin_dashboard.html',
-                            parking_lots=parking_lots,
-                            total_spots=total_spots,
-                            occupied_spots=occupied_spots,
-                            available_spots=available_spots,
-                            users=users,
-                            today_revenue=today_revenue,
-                            yesterday_revenue=yesterday_revenue,
-                            revenue_change=revenue_change,
-                            revenue_change_percent=revenue_change_percent,
-                            new_users_today=new_users_today,
-                            user_change=user_change,
-                            user_change_percent=user_change_percent,
-                            spot_change=spot_change,
-                            total_revenue=total_revenue,
-                            lot_data=lot_data,
-                            chart_data=chart_data)
-    except Exception as e:
-        app.logger.error(f"Error in admin_dashboard: {str(e)}")
-        flash(f'An error occurred while loading the dashboard: {str(e)}', 'danger')
-        return redirect(url_for('index'))
+# -------------------- User Routes --------------------
 
 @app.route('/user/dashboard')
 @login_required
@@ -308,6 +228,44 @@ def user_dashboard():
         flash('An error occurred while loading the dashboard', 'danger')
         return redirect(url_for('index'))
 
+@app.route('/user/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if session.get('user_type') != 'user':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        try:
+            # Update user details
+            current_user.name = request.form.get('name')
+            current_user.email = request.form.get('email')
+            current_user.address = request.form.get('address')
+            
+            # Handle pincode as integer
+            pincode = request.form.get('pincode')
+            if not pincode.isdigit():
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return jsonify({'success': False, 'message': 'Pincode must contain only numbers'})
+                flash('Pincode must contain only numbers', 'danger')
+                return redirect(url_for('edit_profile'))
+            current_user.pincode = pincode
+            
+            db.session.commit()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': True, 'message': 'Profile updated successfully'})
+            
+            flash('Profile updated successfully', 'success')
+            return redirect(url_for('user_dashboard'))
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'An error occurred while updating profile'})
+            flash('An error occurred while updating profile', 'danger')
+            return redirect(url_for('edit_profile'))
+    
+    return render_template('edit_profile.html', user=current_user)
+
 @app.route('/user/parking_lots')
 @login_required
 def user_parking_lots():
@@ -334,27 +292,14 @@ def user_parking_lots():
             available_spot_ids[lot.id] = [spot.id for spot in spots if spot.status == 'A']
         
         return render_template('user_parking_lots.html',
-                             parking_lots=parking_lots,
-                             available_spots=available_spots,
-                             available_spot_ids=available_spot_ids,
-                             current_user=current_user)
+                              parking_lots=parking_lots,
+                              available_spots=available_spots,
+                              available_spot_ids=available_spot_ids,
+                              current_user=current_user)
     except Exception as e:
         app.logger.error(f"Error loading parking lots: {str(e)}\n{traceback.format_exc()}")
         flash('An error occurred while loading parking lots. Please try again later.', 'error')
         return redirect(url_for('user_dashboard'))
-
-def has_active_booking(user_id):
-    """Check if user has any active bookings"""
-    try:
-        active_statuses = ['active', 'booked', 'in-progress']
-        active_booking = Reservation.query.filter(
-            Reservation.user_id == user_id,
-            Reservation.status.in_(active_statuses)
-        ).first()
-        return active_booking is not None
-    except Exception as e:
-        print(f"Error checking active bookings: {e}")
-        return False
 
 @app.route('/book_spot', methods=['POST'])
 @login_required
@@ -502,6 +447,107 @@ def vacate_spot(reservation_id):
     flash(f'Spot vacated successfully. Duration: {duration_text}. Payment of ₹{reservation.parking_cost:.2f} completed via {payment_method}.', 'success')
     return redirect(url_for('user_dashboard'))
 
+# -------------------- Admin Routes --------------------
+
+@app.route('/admin/dashboard')
+@login_required
+def admin_dashboard():
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    try:
+        parking_lots = ParkingLot.query.all()
+        total_spots = ParkingSpot.query.count()
+        occupied_spots = ParkingSpot.query.filter_by(status='O').count()
+        available_spots = total_spots - occupied_spots
+        users = User.query.count()
+        
+        # Get today's date at midnight
+        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        yesterday = today - timedelta(days=1)
+        
+        # Calculate today's revenue
+        today_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+            .filter(Reservation.leaving_timestamp >= today,
+                    Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+        
+        # Calculate yesterday's revenue
+        yesterday_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+            .filter(Reservation.leaving_timestamp >= yesterday,
+                    Reservation.leaving_timestamp < today,
+                    Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+        
+        # Calculate revenue change
+        revenue_change = today_revenue - yesterday_revenue
+        revenue_change_percent = (revenue_change / yesterday_revenue * 100) if yesterday_revenue > 0 else 0
+        
+        # Calculate new users today
+        new_users_today = User.query.filter(User.created_at >= today).count()
+        new_users_yesterday = User.query.filter(
+            User.created_at >= yesterday,
+            User.created_at < today
+        ).count()
+        
+        # Calculate user change
+        user_change = new_users_today - new_users_yesterday
+        user_change_percent = (user_change / new_users_yesterday * 100) if new_users_yesterday > 0 else 0
+        
+        # Calculate spot changes
+        occupied_spots_yesterday = ParkingSpot.query.filter_by(status='O').count()
+        spot_change = occupied_spots - occupied_spots_yesterday
+        
+        # Total revenue calculations
+        total_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+            .filter(Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+        
+        # Prepare data for charts
+        lot_data = []
+        for lot in parking_lots:
+            # Get revenue for this lot
+            lot_revenue = db.session.query(func.coalesce(func.sum(Reservation.parking_cost), 0.0))\
+                .join(ParkingSpot, Reservation.spot_id == ParkingSpot.id)\
+                .filter(ParkingSpot.lot_id == lot.id,
+                        Reservation.leaving_timestamp.isnot(None)).scalar() or 0.0
+            
+            # Get spot counts
+            total_lot_spots = ParkingSpot.query.filter_by(lot_id=lot.id).count()
+            occupied_lot_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='O').count()
+            
+            lot_data.append({
+                'name': lot.prime_location_name,
+                'revenue': lot_revenue,
+                'total_spots': total_lot_spots,
+                'occupied_spots': occupied_lot_spots
+            })
+        
+        # Prepare chart data
+        chart_data = {
+            'lot_data': lot_data
+        }
+        
+        return render_template('admin_dashboard.html',
+                            parking_lots=parking_lots,
+                            total_spots=total_spots,
+                            occupied_spots=occupied_spots,
+                            available_spots=available_spots,
+                            users=users,
+                            today_revenue=today_revenue,
+                            yesterday_revenue=yesterday_revenue,
+                            revenue_change=revenue_change,
+                            revenue_change_percent=revenue_change_percent,
+                            new_users_today=new_users_today,
+                            user_change=user_change,
+                            user_change_percent=user_change_percent,
+                            spot_change=spot_change,
+                            total_revenue=total_revenue,
+                            lot_data=lot_data,
+                            chart_data=chart_data)
+    except Exception as e:
+        app.logger.error(f"Error in admin_dashboard: {str(e)}")
+        flash(f'An error occurred while loading the dashboard: {str(e)}', 'danger')
+        return redirect(url_for('index'))
+
 @app.route('/admin/parking_lots', methods=['GET', 'POST'])
 @login_required
 def admin_parking_lots():
@@ -511,27 +557,40 @@ def admin_parking_lots():
     
     form = ParkingLotForm()
     if form.validate_on_submit():
-        parking_lot = ParkingLot(
-            prime_location_name=form.prime_location_name.data,
-            price=form.price.data,
-            address=form.address.data,
-            pincode=form.pincode.data,
-            max_spots=form.max_spots.data
-        )
-        db.session.add(parking_lot)
-        db.session.commit()
-        
-        # Auto-generate parking spots
-        for i in range(1, parking_lot.max_spots + 1):
-            spot = ParkingSpot(
-                lot_id=parking_lot.id,
-                status='A'  # Available
+        try:
+            # Convert pincode to integer and validate
+            pincode = form.pincode.data
+            if not str(pincode).isdigit():
+                flash('Pincode must contain only numbers', 'danger')
+                return render_template('admin_parking_lots.html', form=form)
+            
+            parking_lot = ParkingLot(
+                prime_location_name=form.prime_location_name.data,
+                price=form.price.data,
+                address=form.address.data,
+                pincode=int(pincode),
+                max_spots=form.max_spots.data
             )
-            db.session.add(spot)
-        
-        db.session.commit()
-        flash('Parking lot added successfully', 'success')
-        return redirect(url_for('admin_parking_lots'))
+            db.session.add(parking_lot)
+            db.session.commit()
+            
+            # Auto-generate parking spots
+            for i in range(1, parking_lot.max_spots + 1):
+                spot = ParkingSpot(
+                    lot_id=parking_lot.id,
+                    status='A'  # Available
+                )
+                db.session.add(spot)
+            
+            db.session.commit()
+            flash('Parking lot added successfully', 'success')
+            return redirect(url_for('admin_parking_lots'))
+        except ValueError as e:
+            flash('Invalid input. Please check your values.', 'danger')
+            return render_template('admin_parking_lots.html', form=form)
+        except Exception as e:
+            flash('An error occurred while adding the parking lot', 'danger')
+            return render_template('admin_parking_lots.html', form=form)
     
     parking_lots = ParkingLot.query.all()
     lot_revenues = {}
@@ -552,28 +611,41 @@ def edit_parking_lot(lot_id):
     parking_lot = ParkingLot.query.get_or_404(lot_id)
     
     if request.method == 'POST':
-        # Update parking lot details
-        parking_lot.prime_location_name = request.form.get('prime_location_name')
-        parking_lot.price = float(request.form.get('price'))
-        parking_lot.address = request.form.get('address')
-        parking_lot.pincode = request.form.get('pincode')
-        
-        # Handle max_spots changes
-        new_max_spots = int(request.form.get('max_spots'))
-        if new_max_spots > parking_lot.max_spots:
-            # Add new spots
-            for i in range(parking_lot.max_spots + 1, new_max_spots + 1):
-                spot = ParkingSpot(
-                    lot_id=parking_lot.id,
-                    status='A'  # Available
-                )
-                db.session.add(spot)
-        
-        parking_lot.max_spots = new_max_spots
-        db.session.commit()
-        
-        flash('Parking lot updated successfully', 'success')
-        return redirect(url_for('admin_parking_lots'))
+        try:
+            # Update parking lot details
+            parking_lot.prime_location_name = request.form.get('prime_location_name')
+            parking_lot.price = float(request.form.get('price'))
+            parking_lot.address = request.form.get('address')
+            
+            # Convert pincode to integer and validate
+            pincode = request.form.get('pincode')
+            if not pincode.isdigit():
+                flash('Pincode must contain only numbers', 'danger')
+                return redirect(url_for('admin_parking_lots'))
+            parking_lot.pincode = int(pincode)
+            
+            # Handle max_spots changes
+            new_max_spots = int(request.form.get('max_spots'))
+            if new_max_spots > parking_lot.max_spots:
+                # Add new spots
+                for i in range(parking_lot.max_spots + 1, new_max_spots + 1):
+                    spot = ParkingSpot(
+                        lot_id=parking_lot.id,
+                        status='A'  # Available
+                    )
+                    db.session.add(spot)
+            
+            parking_lot.max_spots = new_max_spots
+            db.session.commit()
+            
+            flash('Parking lot updated successfully', 'success')
+            return redirect(url_for('admin_parking_lots'))
+        except ValueError as e:
+            flash('Invalid input. Please check your values.', 'danger')
+            return redirect(url_for('admin_parking_lots'))
+        except Exception as e:
+            flash('An error occurred while updating the parking lot', 'danger')
+            return redirect(url_for('admin_parking_lots'))
     
     return redirect(url_for('admin_parking_lots'))
 
@@ -645,12 +717,21 @@ def admin_users():
         # Execute query
         results = query.all()
         
-        # Convert the query results to a list of user objects with additional attributes
+        # Convert the query results to a list of dictionaries
         users_with_stats = []
         for user, total_bookings, total_spent in results:
-            user.total_bookings = total_bookings or 0
-            user.total_spent = total_spent or 0.0
-            users_with_stats.append(user)
+            user_dict = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'name': user.name,
+                'address': user.address,
+                'pincode': user.pincode,
+                'created_at': user.created_at,
+                'total_bookings': total_bookings or 0,
+                'total_spent': float(total_spent or 0.0)
+            }
+            users_with_stats.append(user_dict)
         
         form = EditUserForm()
         return render_template('admin_users.html', users=users_with_stats, form=form)
@@ -725,6 +806,74 @@ def end_reservation(spot_id):
     flash(f'Reservation ended successfully. Total cost: ₹{cost:.2f}', 'success')
     return redirect(url_for('admin_occupied_spots'))
 
+@app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
+@login_required
+def edit_user(user_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    user = User.query.get_or_404(user_id)
+    form = EditUserForm()
+    
+    if form.validate_on_submit():
+        user.name = form.full_name.data
+        user.email = form.email.data
+        user.address = form.address.data
+        user.pincode = form.pincode.data
+        db.session.commit()
+        flash('User details updated successfully.', 'success')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'danger')
+    
+    return redirect(url_for('admin_users'))
+
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+    
+    user = User.query.get_or_404(user_id)
+    
+    # Delete all reservations associated with this user
+    Reservation.query.filter_by(user_id=user_id).delete()
+    
+    # Now delete the user
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash('User and their reservations deleted successfully.', 'success')
+    return redirect(url_for('admin_users'))
+
+@app.route('/admin/force_release/<int:reservation_id>', methods=['POST'])
+@login_required
+def force_release(reservation_id):
+    if session.get('user_type') != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('admin_occupied_spots'))
+    reservation = Reservation.query.get_or_404(reservation_id)
+    if reservation.leaving_timestamp is not None:
+        flash('This reservation is already completed.', 'warning')
+        return redirect(url_for('admin_occupied_spots'))
+    # Set leaving_timestamp to now
+    now = datetime.now()
+    reservation.leaving_timestamp = now
+    # Free up the spot
+    spot = ParkingSpot.query.get(reservation.spot_id)
+    spot.status = 'A'
+    # Mark as force released (add column if not present)
+    if hasattr(reservation, 'force_released'):
+        reservation.force_released = True
+    db.session.commit()
+    flash(f'Spot {spot.id} force released. Booking ended.', 'success')
+    return redirect(url_for('admin_occupied_spots'))
+
+# -------------------- API Routes --------------------
+
 @app.route('/api/parking_stats')
 def api_parking_stats():
     parking_lots = ParkingLot.query.count()
@@ -771,165 +920,6 @@ def api_user_reservations(user_id):
         })
     
     return jsonify(result)
-
-@app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
-@login_required
-def edit_user(user_id):
-    if session.get('user_type') != 'admin':
-        flash('Access denied', 'danger')
-        return redirect(url_for('index'))
-    
-    user = User.query.get_or_404(user_id)
-    form = EditUserForm()
-    
-    if form.validate_on_submit():
-        user.name = form.full_name.data
-        user.email = form.email.data
-        user.address = form.address.data
-        user.pincode = form.pincode.data
-        db.session.commit()
-        flash('User details updated successfully.', 'success')
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f'{field}: {error}', 'danger')
-    
-    return redirect(url_for('admin_users'))
-
-@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
-@login_required
-def delete_user(user_id):
-    if session.get('user_type') != 'admin':
-        flash('Access denied', 'danger')
-        return redirect(url_for('index'))
-    
-    user = User.query.get_or_404(user_id)
-    
-    # Delete all reservations associated with this user
-    Reservation.query.filter_by(user_id=user_id).delete()
-    
-    # Now delete the user
-    db.session.delete(user)
-    db.session.commit()
-    
-    flash('User and their reservations deleted successfully.', 'success')
-    return redirect(url_for('admin_users'))
-
-@app.route('/search_lots', methods=['POST'])
-@login_required
-def search_lots():
-    if session.get('user_type') != 'user':
-        return jsonify({'error': 'Unauthorized'}), 403
-    data = request.get_json() if request.is_json else request.form
-    query = data.get('search_query', '').strip()
-    if not query:
-        return jsonify({'results': []})
-    lots = ParkingLot.query.filter(
-        (ParkingLot.address.ilike(f'%{query}%')) |
-        (ParkingLot.pincode.ilike(f'%{query}%'))
-    ).all()
-    results = []
-    for lot in lots:
-        available_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
-        results.append({
-            'id': lot.id,
-            'address': lot.address,
-            'available_spots': available_spots
-        })
-    return jsonify({'results': results})
-
-@app.route('/admin/force_release/<int:reservation_id>', methods=['POST'])
-@login_required
-def force_release(reservation_id):
-    if session.get('user_type') != 'admin':
-        flash('Access denied', 'danger')
-        return redirect(url_for('admin_occupied_spots'))
-    reservation = Reservation.query.get_or_404(reservation_id)
-    if reservation.leaving_timestamp is not None:
-        flash('This reservation is already completed.', 'warning')
-        return redirect(url_for('admin_occupied_spots'))
-    # Set leaving_timestamp to now
-    now = datetime.now()
-    reservation.leaving_timestamp = now
-    # Free up the spot
-    spot = ParkingSpot.query.get(reservation.spot_id)
-    spot.status = 'A'
-    # Mark as force released (add column if not present)
-    if hasattr(reservation, 'force_released'):
-        reservation.force_released = True
-    db.session.commit()
-    flash(f'Spot {spot.id} force released. Booking ended.', 'success')
-    return redirect(url_for('admin_occupied_spots'))
-
-@app.route('/user/edit_profile', methods=['POST'])
-@login_required
-def edit_profile():
-    try:
-        if session.get('user_type') != 'user':
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': False,
-                    'message': 'Access denied'
-                })
-            flash('Access denied', 'danger')
-            return redirect(url_for('index'))
-        
-        # Get form data
-        name = request.form.get('name')
-        email = request.form.get('email')
-        address = request.form.get('address')
-        pincode = request.form.get('pincode')
-        
-        # Validate required fields
-        if not all([name, email, address, pincode]):
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': False,
-                    'message': 'Please fill in all required fields.'
-                })
-            flash('Please fill in all required fields.', 'danger')
-            return redirect(url_for('user_dashboard'))
-        
-        # Check if email is already taken by another user
-        existing_user = User.query.filter(User.email == email, User.id != current_user.id).first()
-        if existing_user:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': False,
-                    'message': 'Email is already taken by another user.'
-                })
-            flash('Email is already taken by another user.', 'danger')
-            return redirect(url_for('user_dashboard'))
-        
-        # Update user profile
-        current_user.name = name
-        current_user.email = email
-        current_user.address = address
-        current_user.pincode = pincode
-        
-        db.session.commit()
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({
-                'success': True,
-                'message': 'Profile updated successfully!'
-            })
-        
-        flash('Profile updated successfully.', 'success')
-        return redirect(url_for('user_dashboard'))
-        
-    except Exception as e:
-        app.logger.error(f"Error updating profile: {str(e)}\n{traceback.format_exc()}")
-        db.session.rollback()
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({
-                'success': False,
-                'message': 'An error occurred while updating your profile.'
-            })
-        
-        flash('An error occurred while updating your profile.', 'danger')
-        return redirect(url_for('user_dashboard'))
 
 @app.route('/api/users/search')
 @login_required
