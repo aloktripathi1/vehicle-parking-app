@@ -688,34 +688,6 @@
             // Dispatch theme change event for components that need to update
             document.dispatchEvent(new Event('themeChanged'));
         });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var manageDropdown = document.getElementById('manageDropdown');
-            var dropdownMenu = manageDropdown && manageDropdown.nextElementSibling;
-            if (manageDropdown && dropdownMenu) {
-                // Open on hover (desktop)
-                manageDropdown.parentElement.addEventListener('mouseenter', function() {
-                    if (window.innerWidth > 991) {
-                        dropdownMenu.classList.add('show');
-                        manageDropdown.setAttribute('aria-expanded', 'true');
-                    }
-                });
-                manageDropdown.parentElement.addEventListener('mouseleave', function() {
-                    if (window.innerWidth > 991) {
-                        dropdownMenu.classList.remove('show');
-                        manageDropdown.setAttribute('aria-expanded', 'false');
-                    }
-                });
-                // Open on click (mobile)
-                manageDropdown.addEventListener('click', function(e) {
-                    if (window.innerWidth <= 991) {
-                        e.preventDefault();
-                        dropdownMenu.classList.toggle('show');
-                        manageDropdown.setAttribute('aria-expanded', dropdownMenu.classList.contains('show'));
-                    }
-                });
-            }
-        });
     </script>
     {% block scripts %}{% endblock %}
 </body>
