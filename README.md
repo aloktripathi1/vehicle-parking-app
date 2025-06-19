@@ -55,7 +55,7 @@ parking_app_23f3003225/
 │   ├── edit_parking_lot.html
 │   ├── index.html
 │   └── error.html
-└── venv/                 # Python virtual environment (not versioned)
+└── ...
 ```
 
 ## 🛣️ Route Organization
