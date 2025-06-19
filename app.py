@@ -61,7 +61,6 @@ with app.app_context():
         admin.set_password('admin123')
         db.session.add(admin)
         db.session.commit()
-    # Optionally, reset password every time (uncomment if needed)
     # else:
     #     admin.set_password('admin123')
     #     db.session.commit()

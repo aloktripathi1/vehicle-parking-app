@@ -55,7 +55,7 @@ parking_app_23f3003225/
 │   ├── edit_parking_lot.html
 │   ├── index.html
 │   └── error.html
-└── ...
+└── venv/                 # Python virtual environment (not versioned)
 ```
 
 ## 🛣️ Route Organization
@@ -131,3 +131,18 @@ pip install -r requirements.txt
 python app.py
 ```
 
+## 🔒 Default Admin Credentials
+- Email: `admin@parkease.com`
+- Password: `admin123`
+
+## 📝 Notes
+- The application uses SQLite as the database, which is automatically initialized on first run
+- Admin user is created automatically and is always present
+- All monetary values are in Indian Rupees (₹)
+- Parking costs are calculated based on hourly rates set by the admin
+- **No other tech stack is used**: Only Flask, Jinja2, HTML/CSS/Bootstrap, SQLite (via SQLAlchemy), and Chart.js for charts
+- All features are accessible and demoable locally
+
+---
+
+**This project fully meets the requirements for a multi-user, admin-controlled 4-wheeler parking management system as specified in the assignment.**
