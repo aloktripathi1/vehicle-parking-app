@@ -59,7 +59,7 @@
                     <h2 class="mb-2">{{ parking_lots|length }}</h2>
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                    <a href="{{ url_for('admin_parking_lots') }}" class="text-primary text-decoration-none small">
+                    <a href="{{ url_for('admin.admin_parking_lots') }}" class="text-primary text-decoration-none small">
                         View Details <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
@@ -83,7 +83,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                    <a href="{{ url_for('admin_parking_lots') }}" class="text-success text-decoration-none small">
+                    <a href="{{ url_for('admin.admin_parking_lots') }}" class="text-success text-decoration-none small">
                         View Details <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                    <a href="{{ url_for('admin_occupied_spots') }}" class="text-warning text-decoration-none small">
+                    <a href="{{ url_for('admin.occupied_spots') }}" class="text-warning text-decoration-none small">
                         View Details <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
@@ -132,7 +132,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                    <a href="{{ url_for('admin_users') }}" class="text-info text-decoration-none small">
+                    <a href="{{ url_for('admin.admin_users') }}" class="text-info text-decoration-none small">
                         View Details <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
@@ -142,26 +142,30 @@
 
     <!-- Charts Section -->
     <div class="row dashboard-row g-3 mb-4">
-        <div class="col-12 col-lg-6">
-            <div class="card dashboard-card">
+        <div class="col-12 col-lg-8">
+            <div class="card dashboard-card h-100">
                 <div class="card-header p-3">
                     <h6 class="m-0 font-weight-bold text-primary">Revenue by Parking Lot</h6>
                 </div>
                 <div class="card-body p-3">
-                    <div class="chart-container" style="position: relative; height: 300px;">
+                    <div class="chart-container">
                         <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-6">
-            <div class="card dashboard-card">
+        <div class="col-12 col-lg-4">
+            <div class="card dashboard-card h-100">
                 <div class="card-header p-3">
                     <h6 class="m-0 font-weight-bold text-primary">Spot Status by Parking Lot</h6>
                 </div>
-                <div class="card-body p-3">
-                    <div class="chart-container" style="position: relative; height: 300px;">
+                <div class="card-body p-3 d-flex align-items-center justify-content-center">
+                    <div class="pie-chart-container">
                         <canvas id="spotStatusChart"></canvas>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center mt-2" style="gap: 1.5rem; font-size: 0.95rem;">
+                        <span><span style="display:inline-block;width:16px;height:16px;background:rgba(75,192,192,0.8);border-radius:3px;margin-right:6px;"></span>Available</span>
+                        <span><span style="display:inline-block;width:16px;height:16px;background:rgba(255,99,132,0.8);border-radius:3px;margin-right:6px;"></span>Occupied</span>
                     </div>
                 </div>
             </div>
@@ -252,31 +256,38 @@ document.addEventListener('DOMContentLoaded', function() {
         // Spot Status Chart
         const spotStatusCtx = document.getElementById('spotStatusChart').getContext('2d');
         new Chart(spotStatusCtx, {
-            type: 'bar',
+            type: 'pie',
             data: {
                 labels: lotData.map(lot => lot.name),
                 datasets: [{
-                    label: 'Total Spots',
-                    data: lotData.map(lot => lot.total_spots),
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: lotData.map(lot => lot.total_spots - lot.occupied_spots),
+                    label: 'Available Spots',
+                    backgroundColor: lotData.map(() => 'rgba(75, 192, 192, 0.8)'),
+                    borderColor: lotData.map(() => 'rgba(75, 192, 192, 1)'),
                     borderWidth: 1
                 }, {
-                    label: 'Occupied Spots',
                     data: lotData.map(lot => lot.occupied_spots),
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
+                    label: 'Occupied Spots',
+                    backgroundColor: lotData.map(() => 'rgba(255, 99, 132, 0.8)'),
+                    borderColor: lotData.map(() => 'rgba(255, 99, 132, 1)'),
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.chart.data.labels[context.dataIndex] || '';
+                                const value = context.raw || 0;
+                                const datasetLabel = context.dataset.label || '';
+                                return `${label}: ${datasetLabel} - ${value}`;
+                            }
                         }
                     }
                 }

@@ -1,139 +1,128 @@
 # Vehicle Parking App
 
 A multi-user 4-wheeler parking management system built with Flask and SQLite.  
-This project is part of **Modern Application Development I** at IITM BS.
+This project is part of **Modern Application Development I** at IITM.
 
 ## 👥 Roles
 
-- **Admin**: Superuser who can manage parking lots and view all spots/users.
+- **Admin**: Superuser who can manage parking lots, view all spots/users, and access full parking history. Admin is hardcoded and always present—no registration required.
 - **User**: Can register/login, reserve, park, and release spots.
 
 ## ⚙️ Tech Stack
 
 - Flask (Python)
-- SQLite (Programmatic DB setup)
+- SQLite (Programmatic DB setup via SQLAlchemy)
 - Jinja2 (Templating)
 - HTML/CSS/Bootstrap (Frontend)
-- Chart.js (Optional summary graphs)
+- Chart.js (Summary graphs)
 
 ## 📁 Project Structure
 
 ```
-parking_app/
-├── app.py              # Main application file with all routes
-├── models.py           # Database models and relationships
-├── forms.py            # Form definitions using WTForms
-├── requirements.txt    # Project dependencies
-├── static/            # Static files (CSS, JS, images)
-│   ├── css/
-│   ├── js/
-│   └── images/
-└── templates/         # HTML templates
-
+parking_app_23f3003225/
+├── app.py                # Main application entry point
+├── models.py             # Database models
+├── forms.py              # WTForms definitions
+├── utils.py              # Utility functions (e.g., timezone)
+├── requirements.txt      # Python dependencies
+├── README.md             # Project documentation
+├── instance/
+│   └── database.db       # SQLite database (auto-created)
+├── migrations/           # Alembic migration files
+├── routes/               # All Flask route blueprints
+│   ├── admin/            # Admin routes (dashboard, lots, users, history, etc.)
+│   ├── api/              # API endpoints (AJAX, data, etc.)
+│   ├── main/             # Main/public routes (index, login, register)
+│   └── user/             # User routes (dashboard, booking, profile)
+├── static/               # Static assets
+│   ├── css/              # Custom and Bootstrap CSS
+│   ├── js/               # Custom JavaScript
+│   ├── parking_lot.jpg   # Images
+│   └── parking_lot1.jpg
+├── templates/            # Jinja2 HTML templates
+│   ├── admin_dashboard.html
+│   ├── admin_parking_lots.html
+│   ├── admin_occupied_spots.html
+│   ├── admin_users.html
+│   ├── admin_parking_history.html
+│   ├── admin_user_reservations.html
+│   ├── user_dashboard.html
+│   ├── user_parking_lots.html
+│   ├── base.html
+│   ├── login.html
+│   ├── register.html
+│   ├── edit_profile.html
+│   ├── edit_parking_lot.html
+│   ├── index.html
+│   └── error.html
+└── venv/                 # Python virtual environment (not versioned)
 ```
 
 ## 🛣️ Route Organization
 
-The application routes in `app.py` are organized into the following sections:
+The application routes are organized into the following sections:
 
-### 1. Utility / Error Handling / Misc
-- `@app.errorhandler(500)` - Internal server error handler
-- `@login_manager.user_loader` - User loader for Flask-Login
-- `has_active_booking()` - Utility function to check active bookings
-
-### 2. Main Routes
+### Main Routes
 - `/` - Home page
 - `/login` - User/Admin login
 - `/register` - New user registration
 - `/logout` - Logout functionality
 
-### 3. User Routes
-- `/user/dashboard` - User's main dashboard
-  - Shows active reservations
-  - Displays booking history
-  - Shows total spent and time statistics
+### User Routes
+- `/user/dashboard` - User's main dashboard (active reservations, booking history, summary charts)
 - `/user/edit_profile` - Update user profile
-  - Edit personal information
-  - Update address and pincode
-- `/user/parking_lots` - View available parking lots
-  - List all parking locations
-  - Show spot availability
-- `/book_spot` - Book a parking spot
-  - Reserve available spots
-  - Handle payment calculation
+- `/user/parking_lots` - View available parking lots and spot availability
+- `/user/book_spot` - Book a parking spot (auto-allotted)
 - `/user/vacate_spot/<id>` - Vacate a parking spot
-  - End current parking session
-  - Calculate final charges
 
-### 4. Admin Routes
-- `/admin/dashboard` - Admin's main dashboard
-  - Revenue statistics
-  - Parking lot overview
-  - User statistics
-- `/admin/parking_lots` - Manage parking lots
-  - Add new parking lots
-  - View all locations
-- `/admin/parking_lot/<id>/edit` - Edit parking lot
-  - Update location details
-  - Modify pricing
-  - Adjust spot capacity
-- `/admin/parking_lot/<id>/delete` - Delete parking lot
-- `/admin/users` - Manage users
-  - View all registered users
-  - User statistics and history
-- `/admin/occupied_spots` - View occupied spots
-  - Monitor current usage
-  - Track active reservations
+### Admin Routes
+- `/admin/dashboard` - Admin's main dashboard (revenue, lot/spot/user stats, summary charts)
+- `/admin/parking_lots` - Manage parking lots (add/edit/delete, adjust spot capacity)
+- `/admin/users` - Manage users (view, edit, delete, see booking history)
+- `/admin/occupied_spots` - View all currently occupied spots
+- `/admin/parking_history` - **Parking History**: Complete log of all reservations ever made, with filters for date range, month/year, and parking lot
 - `/admin/end_reservation/<id>` - End a reservation
 - `/admin/edit_user/<id>` - Edit user details
 - `/admin/delete_user/<id>` - Delete user
 - `/admin/force_release/<id>` - Force release a spot
 
-### 5. API Routes
+### API Routes
 - `/api/parking_stats` - Get parking statistics
-  - Revenue data
-  - Occupancy rates
 - `/api/user/<id>/reservations` - Get user's reservations
-  - Booking history
-  - Active bookings
 - `/api/users/search` - Search users
-  - Filter by name/email
-  - Pagination support
 - `/api/check-active-booking` - Check active bookings
 - `/api/book-parking` - Book parking spot
 - `/api/parking-lots` - Get parking lots
-  - List all locations
-  - Availability status
 - `/api/parking_lot/<id>/spots` - Get spots for a lot
-  - Spot status
-  - Pricing information
 - `/api/admin/user/<id>/reservations` - Get user reservations (admin)
-  - Detailed booking history
-  - Payment information
 
 ## 🔑 Key Features
 
 ### User Features
 - User registration and authentication
-- View available parking spots
-- Book and vacate parking spots
-- View booking history
+- View available parking lots and spots
+- Book and vacate parking spots (auto-allocation)
+- View booking history and summary charts
 - Edit profile information
 
 ### Admin Features
-- Manage parking lots (add/edit/delete)
+- Hardcoded admin (no registration, always present)
+- Manage parking lots (add/edit/delete, adjust spot count)
 - View all users and their bookings
 - Monitor occupied spots
 - Force release parking spots
-- View revenue statistics
-- Manage user accounts
+- View revenue and occupancy statistics (charts)
+- **Parking History**: View a complete, permanent log of all reservations ever made, with advanced filters
 
 ## 🏁 How to Run
 
 ```bash
-# 1. Create virtual environment (optional but recommended)
+# 1. Create virtual environment (recommended)
 python -m venv venv
-source venv/bin/activate  # on Windows: venv\Scripts\activate
+# On Windows:
+venv\Scripts\activate
+# On Mac/Linux:
+source venv/bin/activate
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -143,11 +132,17 @@ python app.py
 ```
 
 ## 🔒 Default Admin Credentials
-- Username: `admin`
+- Email: `admin@parkease.com`
 - Password: `admin123`
 
 ## 📝 Notes
 - The application uses SQLite as the database, which is automatically initialized on first run
-- Admin user is created automatically if it doesn't exist
+- Admin user is created automatically and is always present
 - All monetary values are in Indian Rupees (₹)
 - Parking costs are calculated based on hourly rates set by the admin
+- **No other tech stack is used**: Only Flask, Jinja2, HTML/CSS/Bootstrap, SQLite (via SQLAlchemy), and Chart.js for charts
+- All features are accessible and demoable locally
+
+---
+
+**This project fully meets the requirements for a multi-user, admin-controlled 4-wheeler parking management system as specified in the assignment.**

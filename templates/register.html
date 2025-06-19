@@ -429,7 +429,7 @@
                     <h1>ParkEase</h1>
                 </div>
 
-                <a href="{{ url_for('index') }}" class="home-btn" title="Back to Home">
+                <a href="{{ url_for('main.index') }}" class="home-btn" title="Back to Home">
                     <i class="fas fa-home"></i>
                 </a>
 
@@ -443,29 +443,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
-                <form method="POST" action="{{ url_for('register') }}" class="needs-validation" novalidate>
+                <form method="POST" action="{{ url_for('main.register') }}" class="needs-validation" novalidate>
                     {{ form.hidden_tag() }}
                     
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                {{ form.username(class="form-control", placeholder="Choose a username") }}
-                            </div>
-                            {% if form.username.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.username.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-6">
                             <label for="name" class="form-label">Full Name</label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 {{ form.name(class="form-control", placeholder="Enter your full name") }}
                             </div>
                             {% if form.name.errors %}
@@ -477,7 +462,7 @@
                             {% endif %}
                         </div>
 
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label for="email" class="form-label">Email</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
@@ -536,7 +521,7 @@
 
                 <div class="text-center mt-4">
                     <p class="mb-0 text-muted">Already have an account? 
-                        <a href="{{ url_for('login') }}" class="auth-link">Log in</a>
+                        <a href="{{ url_for('main.login') }}" class="auth-link">Log in</a>
                     </p>
                 </div>
             </div>

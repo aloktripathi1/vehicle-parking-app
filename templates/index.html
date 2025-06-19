@@ -15,7 +15,7 @@
                     Find and reserve parking instantly. Skip the search, park smarter.
                 </p>
                 <div class="d-flex justify-content-center mb-5 animate-fade-in-delay-2">
-                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg" role="button" aria-label="Get started with ParkEase">
+                    <a href="{{ url_for('main.register') }}" class="btn btn-primary btn-lg" role="button" aria-label="Get started with ParkEase">
                         <i class="fas fa-rocket me-2"></i>Get Started
                     </a>
                 </div>
@@ -360,7 +360,7 @@
         <h2 class="mb-4 fw-bold">Ready to Simplify Your Parking Experience?</h2>
         <p class="lead mb-4" style="opacity: 0.9;">Join thousands of users who have already made parking easier with ParkEase.</p>
         {# {% if not current_user.is_authenticated %} #}
-        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-5">
+        <a href="{{ url_for('main.register') }}" class="btn btn-light btn-lg px-5">
             <i class="fas fa-rocket me-2"></i>Get Started Now
         </a>
         {# {% endif %} #}

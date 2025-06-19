@@ -57,23 +57,35 @@
                                     <td class="dark-mode-text">₹{{ '%.2f' % lot_revenues[lot.id] }}</td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button type="button" class="btn btn-sm btn-info btn-action" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#checkSpotsModal{{ lot.id }}"
-                                                    title="Check Spots Status">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
                                             <button type="button" class="btn btn-sm btn-primary btn-action" 
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#editParkingLotModal{{ lot.id }}"
-                                                    title="Edit Parking Lot">
+                                                    title="Edit Parking Lot"
+                                                    {% if lot.spots|selectattr('status', 'equalto', 'O')|list|length > 0 %}
+                                                    disabled
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Cannot modify parking lot while it has active/occupied spots"
+                                                    {% endif %}>
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger btn-action" 
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#deleteModal{{ lot.id }}" 
-                                                    title="Delete Parking Lot">
+                                                    title="Delete Parking Lot"
+                                                    {% if lot.spots|selectattr('status', 'equalto', 'O')|list|length > 0 %}
+                                                    disabled
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Cannot delete parking lot while it has active/occupied spots"
+                                                    {% endif %}>
                                                 <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-info btn-action" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#checkSpotsModal{{ lot.id }}"
+                                                    title="Check Spots Status">
+                                                <i class="fas fa-eye"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -92,7 +104,7 @@
 <div class="modal fade" id="addParkingLotModal" tabindex="-1" aria-labelledby="addParkingLotModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('admin_parking_lots') }}">
+            <form method="POST" action="{{ url_for('admin.admin_parking_lots') }}">
                 {{ form.hidden_tag() }}
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold" id="addParkingLotModalLabel">
@@ -173,7 +185,7 @@
 <div class="modal fade" id="editParkingLotModal{{ lot.id }}" tabindex="-1" aria-labelledby="editParkingLotModalLabel{{ lot.id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('edit_parking_lot', lot_id=lot.id) }}">
+            <form method="POST" action="{{ url_for('admin.edit_parking_lot', lot_id=lot.id) }}">
                 {{ form.hidden_tag() }}
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold" id="editParkingLotModalLabel{{ lot.id }}">
@@ -234,7 +246,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form action="{{ url_for('delete_parking_lot', lot_id=lot.id) }}" method="POST">
+                <form action="{{ url_for('admin.delete_parking_lot', lot_id=lot.id) }}" method="POST">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
@@ -242,25 +254,36 @@
     </div>
 </div>
 
-<!-- Check Spots Modal -->
+<!-- Spot Status Modal -->
 <div class="modal fade" id="checkSpotsModal{{ lot.id }}" tabindex="-1" aria-labelledby="checkSpotsModalLabel{{ lot.id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title" id="checkSpotsModalLabel{{ lot.id }}">
-                    <i class="fas fa-eye me-2"></i>Spot Status - {{ lot.prime_location_name }}
+                    <i class="fas fa-eye me-2 text-primary"></i>Spot Status - {{ lot.prime_location_name }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body pt-3">
                 <!-- Summary Section -->
-                <div class="spot-summary mb-3 p-3 bg-light rounded">
-                    <h6 class="mb-0 text-start">
-                        <span class="badge bg-primary me-2">🔢</span>
-                        Available Spots: <span id="availableSpotsCount{{ lot.id }}" class="fw-bold">-</span> / <span id="totalSpotsCount{{ lot.id }}" class="fw-bold">-</span>
-                    </h6>
+                <div class="spot-summary mb-4 p-3 rounded" style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Available: <span class="fw-bold">{{ lot.spots|selectattr('status', 'equalto', 'A')|list|length }}</span>
+                            </h6>
+                            <h6 class="mb-0">
+                                <i class="fas fa-times-circle text-danger me-2"></i>
+                                Occupied: <span class="fw-bold">{{ lot.spots|selectattr('status', 'equalto', 'O')|list|length }}</span>
+                            </h6>
+                        </div>
+                        <h6 class="mb-0">
+                            <i class="fas fa-parking text-primary me-2"></i>
+                            Total: <span class="fw-bold">{{ lot.spots|length }}</span>
+                        </h6>
+                    </div>
                 </div>
-                
                 <div class="table-responsive" style="max-height: 300px;">
                     <table class="table table-hover">
                         <thead>
@@ -269,19 +292,24 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="spotsTableBody{{ lot.id }}">
-                            <tr>
-                                <td colspan="2" class="text-center">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
+                        <tbody>
+                            {% for spot in lot.spots %}
+                            <tr class="{{ 'table-danger' if spot.status == 'O' else 'table-success' }}">
+                                <td>{{ spot.id }}</td>
+                                <td>
+                                    {% if spot.status == 'O' %}
+                                    <span class="text-danger"><i class="fas fa-times-circle me-2"></i>Occupied</span>
+                                    {% else %}
+                                    <span class="text-success"><i class="fas fa-check-circle me-2"></i>Available</span>
+                                    {% endif %}
                                 </td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-0 pt-3">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -549,6 +577,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
         });
+    });
+
+    // Initialize all tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
     });
 });
 </script>

@@ -304,6 +304,7 @@ body[data-theme="dark"] .reservation-details i {
                         <table class="table admin-table" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
+                                    <th class="dark-mode-text">Parking Lot</th>
                                     <th class="dark-mode-text">Spot ID</th>
                                     <th class="dark-mode-text">User</th>
                                     <th class="dark-mode-text">Vehicle Number</th>
@@ -316,10 +317,11 @@ body[data-theme="dark"] .reservation-details i {
                             <tbody>
                                 {% for spot, lot, reservation, user in occupied_spots %}
                                 <tr>
+                                    <td class="dark-mode-text">{{ lot.prime_location_name }}</td>
                                     <td class="dark-mode-text">{{ spot.id }}</td>
-                                    <td class="dark-mode-text">{{ user.name }} ({{ user.username }})</td>
+                                    <td class="dark-mode-text">{{ user.name }}{% if user.username %} {{ user.username }}{% endif %}</td>
                                     <td class="dark-mode-text">{{ reservation.vehicle_number if reservation.vehicle_number else 'N/A' }}</td>
-                                    <td class="dark-mode-text">{{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+                                    <td class="dark-mode-text">{{ format_ist_datetime(reservation.parking_timestamp) }}</td>
                                     <td class="dark-mode-text">
                                         {% set duration = (now - reservation.parking_timestamp).total_seconds() // 60 %}
                                         {% if duration < 60 %}
@@ -381,7 +383,7 @@ body[data-theme="dark"] .reservation-details i {
                     </div>
                     <div class="detail-item">
                         <label>Parked Since:</label>
-                        <span>{{ reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                        <span>{{ format_ist_datetime(reservation.parking_timestamp) }}</span>
                     </div>
                     <div class="detail-item">
                         <label>Location:</label>
@@ -395,7 +397,7 @@ body[data-theme="dark"] .reservation-details i {
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <form action="{{ url_for('end_reservation', spot_id=spot.id) }}" method="POST" class="d-inline">
+                <form action="{{ url_for('admin.end_reservation', spot_id=spot.id) }}" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-check-circle me-2"></i>End Reservation
                     </button>
@@ -436,19 +438,15 @@ body[data-theme="dark"] .reservation-details i {
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('dataTable');
-    const tbody = table.getElementsByTagName('tbody')[0];
-    const rows = tbody.getElementsByTagName('tr');
-
-    searchInput.addEventListener('keyup', function() {
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
         const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#dataTable tbody tr');
 
         for (let row of rows) {
-            const spotId = row.cells[0].textContent.toLowerCase();
-            const userName = row.cells[1].textContent.toLowerCase();
-            const vehicleNumber = row.cells[2].textContent.toLowerCase();
+            const spotId = row.cells[1].textContent.toLowerCase();
+            const userName = row.cells[2].textContent.toLowerCase();
+            const vehicleNumber = row.cells[3].textContent.toLowerCase();
 
             if (spotId.includes(searchText) || 
                 userName.includes(searchText) || 
@@ -458,7 +456,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.style.display = 'none';
             }
         }
-    });
 });
 </script>
 {% endblock %}

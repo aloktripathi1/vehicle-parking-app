@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (!this.isProfileComplete()) {
+                // Set flag to show booking modal after profile completion
+                sessionStorage.setItem('showBookingAfterProfile', 'true');
                 profileModal.show();
                 return false;
             }
@@ -60,7 +62,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update modal content
             document.getElementById('modalLotId').value = lotId;
             document.getElementById('modalLotName').textContent = lotName;
+            document.getElementById('modalAddress').textContent = address;
+            document.getElementById('modalPincode').textContent = `Pincode: ${pincode}`;
             document.getElementById('modalPrice').textContent = `₹${price}/hr`;
+            // Set spot_id to first available spot
+            const spotIds = button.dataset.spotIds ? button.dataset.spotIds.split(',').filter(Boolean) : [];
+            document.getElementById('modalSpotId').value = spotIds[0] || '';
         },
         
         resetForm() {
@@ -104,10 +111,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     successAlert.classList.remove('d-none');
                     
-                    if (BookingValidator.isProfileComplete()) {
+                    // Check if this update was triggered from a booking attempt
+                    const wasTriggeredFromBooking = document.querySelector('#profileModal').classList.contains('show') || 
+                                                  sessionStorage.getItem('showBookingAfterProfile') === 'true';
+                    
+                    if (wasTriggeredFromBooking && BookingValidator.isProfileComplete()) {
+                        // Clear the flag
+                        sessionStorage.removeItem('showBookingAfterProfile');
+                        
                         setTimeout(() => {
                             editProfileModal.hide();
-                            bookModal.show();
+                            // Get the last clicked booking button
+                            const lastClickedBtn = document.querySelector('.lot-book-btn[data-last-clicked="true"]');
+                            if (lastClickedBtn) {
+                                BookingModalHandler.updateModalContent(lastClickedBtn);
+                                lastClickedBtn.removeAttribute('data-last-clicked');
+                                setTimeout(() => bookModal.show(), 500);
+                            }
+                        }, 1500);
+                    } else {
+                        // Just close the edit profile modal after success
+                        setTimeout(() => {
+                            editProfileModal.hide();
                         }, 1500);
                     }
                 } else {
@@ -171,272 +196,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
     
-    // Search, Sort, and Filter Functionality
-    const ParkingLotsManager = {
-        lots: [], // Will store all parking lots
-        searchTimeout: null, // For debouncing search
-        isInitialLoad: true, // Flag to track initial load
-
-        initialize() {
-            this.loadParkingLots();
-            this.setupEventListeners();
-        },
-
-        async loadParkingLots() {
-            try {
-                const response = await fetch('/api/parking-lots');
-                if (!response.ok) throw new Error('Failed to fetch parking lots');
-                this.lots = await response.json();
-                
-                // Only render if it's not the initial load
-                if (!this.isInitialLoad) {
-                this.renderParkingLots(this.lots);
-                }
-                this.isInitialLoad = false;
-            } catch (error) {
-                console.error('Error loading parking lots:', error);
-                this.showErrorMessage('Failed to load parking lots. Please refresh the page.');
-            }
-        },
-
-        setupEventListeners() {
-            // Search functionality with debouncing
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    clearTimeout(this.searchTimeout);
-                    this.searchTimeout = setTimeout(() => {
-                    this.filterLots();
-                    }, 200); // 200ms debounce
-                });
-            }
-
-            // Sort functionality
-            const sortSelect = document.getElementById('sortSelect');
-            if (sortSelect) {
-                sortSelect.addEventListener('change', () => {
-                    this.sortLots();
-                });
-            }
-        },
-
-        filterLots() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-            
-            let filteredLots = this.lots.filter(lot => {
-                // Check for exact pincode match first
-                if (searchTerm && lot.pincode === searchTerm) {
-                    return true;
-                }
-                
-                // Then check for partial name match
-                if (searchTerm && lot.name.toLowerCase().includes(searchTerm)) {
-                    return true;
-                }
-                
-                // If no search term, show all lots
-                return !searchTerm;
-            });
-
-            this.sortLots(filteredLots);
-        },
-
-        sortLots(lots = null) {
-            const sortValue = document.getElementById('sortSelect').value;
-            const lotsToSort = lots || this.lots;
-
-            let sortedLots = [...lotsToSort];
-            switch (sortValue) {
-                case 'price-asc':
-                    sortedLots.sort((a, b) => a.price_per_hour - b.price_per_hour);
-                    break;
-                case 'price-desc':
-                    sortedLots.sort((a, b) => b.price_per_hour - a.price_per_hour);
-                    break;
-                case 'spots':
-                    sortedLots.sort((a, b) => b.available_spots - a.available_spots);
-                    break;
-                default:
-                    // Default sort by proximity (if location data is available)
-                    // For now, just maintain original order
-                    break;
-            }
-
-            this.renderParkingLots(sortedLots);
-        },
-
-        renderParkingLots(lots) {
-            const container = document.getElementById('parkingLotsContainer');
-            if (!container) return;
-
-            // Only update if there's a change in the results
-            if (container.children.length !== lots.length || 
-                document.getElementById('searchInput').value.trim() !== '' ||
-                document.getElementById('sortSelect').value !== 'price-asc') {
-
-            container.innerHTML = '';
-            
-            if (lots.length === 0) {
-                container.innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <i class="fas fa-search fa-3x mb-3 text-muted"></i>
-                        <h4 class="text-muted">No parking lots found</h4>
-                            <p class="text-muted">Try adjusting your search criteria</p>
-                    </div>
-                `;
-                return;
-            }
-
-            lots.forEach(lot => {
-                const card = this.createParkingLotCard(lot);
-                container.appendChild(card);
-            });
-
-            // Reattach event listeners to the new cards
-            this.reattachEventListeners();
-            }
-        },
-
-        createParkingLotCard(lot) {
-            const col = document.createElement('div');
-            col.className = 'col-12 col-md-6 col-lg-4 parking-lot-card';
-            
-            col.innerHTML = `
-                <div class="card bg-white dark-mode-card rounded shadow h-100">
-                    <div class="card-header bg-white dark-mode-card border-bottom pt-4 pb-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 text-primary dark-mode-text parking-lot-name">
-                                <i class="fas fa-building me-2"></i>${lot.name}
-                            </h5>
-                            <span class="badge bg-primary price-badge">₹${lot.price_per_hour}/hr</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Location Details -->
-                        <div class="location-details mb-4">
-                            <p class="mb-2 dark-mode-text">
-                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                                <span class="location-text">${lot.address}</span>
-                        </p>
-                            <p class="mb-0 dark-mode-text">
-                                <i class="fas fa-map-pin text-primary me-2"></i>
-                                <span class="pincode-text">${lot.pincode}</span>
-                            </p>
-                        </div>
-                        
-                        <!-- Availability Bar -->
-                        <div class="availability-section mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted dark-mode-text">
-                                    <i class="fas fa-car-side me-1"></i> Available Spots
-                            </span>
-                                <span class="fw-bold dark-mode-text">${lot.available_spots}</span>
-                            </div>
-                            <div class="availability-bar">
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: ${(lot.available_spots / 5) * 100}%"
-                                        aria-valuenow="${lot.available_spots}" 
-                                        aria-valuemin="0" 
-                                        aria-valuemax="5">
-                                    </div>
-                                    <div class="progress-bar bg-danger" role="progressbar" 
-                                        style="width: ${100 - (lot.available_spots / 5) * 100}%"
-                                        aria-valuenow="${5 - lot.available_spots}" 
-                                        aria-valuemin="0" 
-                                        aria-valuemax="5">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
-                        ${lot.available_spots > 0 ? `
-                            <button type="button" class="btn btn-primary w-100 lot-book-btn" 
-                                data-lot-id="${lot.id}"
-                                data-lot-name="${lot.name}"
-                                data-address="${lot.address}"
-                                data-pincode="${lot.pincode}"
-                                data-price="${lot.price_per_hour}"
-                                data-available-spots="${lot.available_spots}"
-                                data-spot-ids="${lot.spot_ids.join(',')}">
-                                <i class="fas fa-calendar-check me-2"></i>Book a Spot
-                            </button>
-                        ` : `
-                            <button class="btn btn-secondary w-100" disabled>
-                                <i class="fas fa-times-circle me-2"></i>No Available Spots
-                        </button>
-                        `}
-                    </div>
-                </div>
-            `;
-            
-            return col;
-        },
-
-        reattachEventListeners() {
-            document.querySelectorAll('.lot-book-btn').forEach(button => {
-                button.addEventListener('click', async function () {
-                    try {
-                        // Always reset booking form before any check to avoid stale state
-                        BookingModalHandler.resetForm();
-                        bookModal.hide();
-                
-                        const hasActiveBooking = await BookingValidator.checkActiveBookings();
-                
-                        if (hasActiveBooking) {
-                            const warningModal = new bootstrap.Modal(document.getElementById('activeBookingWarningModal'));
-                            warningModal.show();
-                
-                            // Optionally bind cancel button here
-                            document.getElementById('cancelBookingBtn')?.addEventListener('click', () => {
-                                // Trigger cancel booking flow (redirect or modal)
-                                window.location.href = '/cancel-booking'; // or trigger modal here
-                            });
-                
-                            return;
-                        }
-                
-                        if (!BookingValidator.isProfileComplete()) {
-                            profileModal.show();
-                            return;
-                        }
-                
-                        // All checks passed, show booking modal
-                        BookingModalHandler.updateModalContent(this);
-                        bookModal.show();
-                
-                    } catch (error) {
-                        console.error('Error during booking check:', error);
-                        showErrorMessage('Error checking booking eligibility. Please try again.');
-                        BookingModalHandler.resetForm();
-                        bookModal.hide();
-                    }
-                });           
-            });
-        },
-
-        showErrorMessage(message) {
-            const container = document.getElementById('parkingLotsContainer');
-            if (container) {
-                container.innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <i class="fas fa-exclamation-circle fa-3x mb-3 text-danger"></i>
-                        <h4 class="text-danger">Error</h4>
-                        <p class="text-muted">${message}</p>
-                    </div>
-                `;
-            }
-        }
-    };
-
-    // Initialize the ParkingLotsManager
-    ParkingLotsManager.initialize();
-
     // Add event listeners for book buttons
     document.querySelectorAll('.lot-book-btn').forEach(button => {
         button.addEventListener('click', async function(e) {
             e.preventDefault();
+            
+            // Store this button as the last clicked one
+            document.querySelectorAll('.lot-book-btn').forEach(btn => btn.removeAttribute('data-last-clicked'));
+            this.setAttribute('data-last-clicked', 'true');
             
             // Check for active bookings and profile completion
             const isEligible = await BookingValidator.validateBookingEligibility();
@@ -469,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const formData = new FormData(this);
         try {
-            const response = await fetch('/book_spot', {
+            const response = await fetch('/user/book_spot', {
                 method: 'POST',
                 body: formData
             });
@@ -512,4 +279,103 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('bookModal').addEventListener('hidden.bs.modal', function() {
         BookingModalHandler.resetForm();
     });
+
+    // Spot Status Modal Handler
+    function setupSpotStatusModals() {
+        document.querySelectorAll('[id^="checkSpotsModal"]').forEach(modalEl => {
+            const lotId = modalEl.id.replace('checkSpotsModal', '');
+            const modal = new bootstrap.Modal(modalEl);
+            const button = document.querySelector(`[data-bs-target="#checkSpotsModal${lotId}"]`);
+            if (button) {
+                button.addEventListener('click', function() {
+                    // Show loading spinner
+                    document.getElementById(`spotsTableBody${lotId}`).innerHTML = `<tr><td colspan="2" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>`;
+                    document.getElementById(`availableSpotsCount${lotId}`).textContent = '-';
+                    document.getElementById(`totalSpotsCount${lotId}`).textContent = '-';
+                    // Fetch spot data
+                    fetch(`/api/parking_lot/${lotId}/spots`).then(r => r.json()).then(data => {
+                        if (data.success) {
+                            const spots = data.data.spots;
+                            const available = spots.filter(s => s.status === 'A').length;
+                            document.getElementById(`availableSpotsCount${lotId}`).textContent = available;
+                            document.getElementById(`totalSpotsCount${lotId}`).textContent = spots.length;
+                            const tbody = document.getElementById(`spotsTableBody${lotId}`);
+                            tbody.innerHTML = '';
+                            spots.forEach(spot => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `<td>${spot.id}</td><td>${spot.status === 'A' ? 'Available' : 'Occupied'}</td>`;
+                                tbody.appendChild(row);
+                            });
+                        } else {
+                            document.getElementById(`spotsTableBody${lotId}`).innerHTML = '<tr><td colspan="2" class="text-center text-danger">Failed to load spot data</td></tr>';
+                        }
+                    }).catch(() => {
+                        document.getElementById(`spotsTableBody${lotId}`).innerHTML = '<tr><td colspan="2" class="text-center text-danger">Failed to load spot data</td></tr>';
+                    });
+                });
+            }
+        });
+    }
+    // Call the setup function after DOMContentLoaded
+    setupSpotStatusModals();
+
+    // Simple search and sort for Available Parking Lots
+    const container = document.getElementById('parkingLotsContainer');
+    if (!container) return;
+
+    // Store original lots
+    const originalLots = Array.from(container.children);
+
+    // Create search and sort UI
+    const searchRow = document.createElement('div');
+    searchRow.className = 'row mb-4';
+    searchRow.innerHTML = `
+        <div class="col-md-6 mb-2">
+            <input type="text" class="form-control w-100" id="searchInput" placeholder="Search by name or pincode..." style="max-width: 300px;">
+        </div>
+        <div class="col-md-6 mb-2 d-flex justify-content-end">
+            <select class="form-select w-100" id="sortSelect" style="max-width: 300px;">
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="spots">Availability: Most to Least</option>
+            </select>
+        </div>
+    `;
+    container.parentNode.insertBefore(searchRow, container);
+
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+
+    function filterAndSortLots() {
+        let lots = Array.from(originalLots);
+        const search = searchInput.value.trim().toLowerCase();
+        if (search) {
+            lots = lots.filter(card => {
+                const name = card.querySelector('.parking-lot-name').textContent.toLowerCase();
+                const pincode = card.querySelector('.pincode-text').textContent.toLowerCase();
+                return name.includes(search) || pincode.includes(search);
+            });
+        }
+        // Sort
+        if (sortSelect.value === 'price-asc') {
+            lots.sort((a, b) => getPrice(a) - getPrice(b));
+        } else if (sortSelect.value === 'price-desc') {
+            lots.sort((a, b) => getPrice(b) - getPrice(a));
+        } else if (sortSelect.value === 'spots') {
+            lots.sort((a, b) => getSpots(b) - getSpots(a));
+        }
+        // Render
+        container.innerHTML = '';
+        lots.forEach(card => container.appendChild(card));
+    }
+    function getPrice(card) {
+        const priceText = card.querySelector('.price-badge').textContent;
+        return parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+    }
+    function getSpots(card) {
+        const spotsText = card.querySelector('.fw-bold.dark-mode-text').textContent;
+        return parseInt(spotsText) || 0;
+    }
+    searchInput.addEventListener('input', filterAndSortLots);
+    sortSelect.addEventListener('change', filterAndSortLots);
 }); 

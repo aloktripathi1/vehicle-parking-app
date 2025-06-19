@@ -32,7 +32,7 @@
                             <div class="d-flex flex-column gap-2">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-clock me-2 dark-mode-text"></i>
-                                    <span class="dark-mode-text"><strong>Parked since:</strong> {{ active_reservation[0].parking_timestamp.strftime('%Y-%m-%d %H:%M') }} UTC</span>
+                                    <span class="dark-mode-text"><strong>Parked since:</strong> {{ format_ist_datetime(active_reservation[0].parking_timestamp) }}</span>
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-hash me-2 dark-mode-text"></i>
@@ -66,7 +66,7 @@
                 <div class="card-body p-4">
                     <p class="mb-3 dark-mode-text">You don't have any active parking reservation. Would you like to book a parking spot?</p>
                     <hr class="dark-mode-border">
-                    <a href="{{ url_for('user_parking_lots') }}" class="btn btn-primary btn-lg px-4">
+                    <a href="{{ url_for('user.user_parking_lots') }}" class="btn btn-primary btn-lg px-4">
                         <i class="fas fa-plus-circle me-2"></i>Book a Parking Spot
                     </a>
                 </div>
@@ -156,15 +156,15 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="table-responsive">
-                        <table class="table table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th class="px-3">ID</th>
-                                    <th class="px-3">Parking Lot</th>
-                                    <th class="px-3">Parked At</th>
-                                    <th class="px-3">Left At</th>
-                                    <th class="px-3">Duration</th>
-                                    <th class="px-3">Cost</th>
+                                    <th>Reservation ID</th>
+                                    <th>Parking Lot</th>
+                                    <th>Park Time</th>
+                                    <th>Leave Time</th>
+                                    <th>Duration</th>
+                                    <th>Cost</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -172,17 +172,21 @@
                                 <tr>
                                     <td class="px-3">{{ reservation.id }}</td>
                                     <td class="px-3">{{ lot.prime_location_name }}</td>
-                                    <td class="px-3">{{ reservation.parking_timestamp.astimezone().strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td class="px-3">{{ reservation.leaving_timestamp.astimezone().strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td class="px-3">{{ format_ist_datetime(reservation.parking_timestamp) }}</td>
+                                    <td class="px-3">{{ format_ist_datetime(reservation.leaving_timestamp) }}</td>
                                     <td class="px-3">
-                                        {% set duration = (reservation.leaving_timestamp - reservation.parking_timestamp).total_seconds() // 60 %}
-                                        {% if duration < 60 %}
-                                            {{ duration|int }} minutes
+                                        {% if reservation.leaving_timestamp %}
+                                            {% set duration = (reservation.leaving_timestamp - reservation.parking_timestamp).total_seconds() // 60 %}
+                                            {% if duration < 60 %}
+                                                {{ duration|int }} minutes
+                                            {% else %}
+                                                {{ (duration // 60)|int }} hours, {{ (duration % 60)|int }} minutes
+                                            {% endif %}
                                         {% else %}
-                                            {{ (duration // 60)|int }} hours, {{ (duration % 60)|int }} minutes
+                                            Active
                                         {% endif %}
                                     </td>
-                                    <td class="px-3">₹{{ reservation.parking_cost }}</td>
+                                    <td class="px-3">₹{{ reservation.parking_cost or 'Pending' }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -249,7 +253,7 @@
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <form action="{{ url_for('vacate_spot', reservation_id=active_reservation[0].id) }}" method="POST" id="paymentForm">
+                <form action="{{ url_for('user.vacate_spot', reservation_id=active_reservation[0].id) }}" method="POST" id="paymentForm">
                     <input type="hidden" name="payment_method" id="paymentMethodInput">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-check-circle me-2"></i>Confirm Payment

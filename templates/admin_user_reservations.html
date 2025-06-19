@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4 text-primary"><i class="fas fa-history me-2"></i>Reservation History - {{ user.name }} ({{ user.email }})</h3>
+    <a href="{{ url_for('admin.admin_users') }}" class="btn btn-secondary mb-3"><i class="fas fa-arrow-left me-2"></i>Back to Users</a>
+    <div class="card mb-5">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Parking Lot</th>
+                            <th>Spot ID</th>
+                            <th>Vehicle No</th>
+                            <th>Parked At</th>
+                            <th>Left At</th>
+                            <th>Duration</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if reservations|length == 0 %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No reservation history found.</td>
+                        </tr>
+                        {% else %}
+                        {% for reservation, spot, lot in reservations %}
+                        <tr>
+                            <td>{{ lot.prime_location_name }}</td>
+                            <td>{{ spot.id }}</td>
+                            <td>{{ reservation.vehicle_number or 'N/A' }}</td>
+                            <td>{{ format_ist_datetime(reservation.parking_timestamp) }}</td>
+                            <td>{{ format_ist_datetime(reservation.leaving_timestamp) }}</td>
+                            <td>
+                                {% if reservation.leaving_timestamp %}
+                                    {% set duration = (reservation.leaving_timestamp - reservation.parking_timestamp).total_seconds() // 60 %}
+                                    {% if duration < 60 %}
+                                        {{ duration|int }} minutes
+                                    {% else %}
+                                        {{ (duration // 60)|int }} hours, {{ (duration % 60)|int }} minutes
+                                    {% endif %}
+                                {% else %}
+                                    Active
+                                {% endif %}
+                            </td>
+                            <td>₹{{ reservation.parking_cost or 'Pending' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

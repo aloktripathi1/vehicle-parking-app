@@ -14,33 +14,6 @@
         </div>
     </div>
 
-    <!-- Search and Filter Section -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card bg-white dark-mode-card rounded shadow">
-                <div class="card-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0">
-                                    <i class="bi bi-search text-muted"></i>
-                    </span>
-                                <input type="text" class="form-control border-start-0 ps-0 dark-mode-input" id="searchInput" placeholder="Search by name or pincode...">
-                            </div>
-                        </div>
-                        <div class="col-md-4 ms-auto">
-                            <select class="form-select dark-mode-input" id="sortSelect">
-                                <option value="price-asc">Price: Low to High</option>
-                                <option value="price-desc">Price: High to Low</option>
-                                <option value="spots">Availability: Most to Least</option>
-                    </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Parking Lots Grid -->
     <div class="row g-4" id="parkingLotsContainer">
         {% for lot in parking_lots %}
@@ -126,7 +99,7 @@
 <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="bookingForm" method="POST" action="{{ url_for('book_spot') }}">
+            <form id="bookingForm" method="POST" action="/user/book_spot">
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold" id="bookModalLabel">
                         <i class="fas fa-calendar-check me-2 text-primary"></i>Book Parking Spot
@@ -139,7 +112,7 @@
                         <div class="d-flex align-items-start mb-3">
                             <i class="fas fa-map-marker-alt text-primary me-2 mt-1"></i>
                             <div>
-                                <span id="modalLotName" class="fw-semibold d-block"></span>
+                                <span id="modalLotName" class="fw-semibold d-block mb-1"></span>
                                 <span id="modalAddress" class="text-muted d-block"></span>
                                 <span id="modalPincode" class="text-muted"></span>
                             </div>
@@ -154,6 +127,7 @@
                     <!-- Vehicle Number Input -->
                     <div class="booking-form">
                         <input type="hidden" id="modalLotId" name="lot_id">
+                        <input type="hidden" id="modalSpotId" name="spot_id">
                         <div class="mb-3">
                             <label for="modalVehicleNumber" class="form-label">Vehicle Number <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="modalVehicleNumber" name="vehicle_number" required
@@ -208,7 +182,7 @@
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                <a href="{{ url_for('user_dashboard') }}" class="btn btn-warning">
+                <a href="{{ url_for('user.user_dashboard') }}" class="btn btn-warning">
                     <i class="fas fa-times-circle me-2"></i>Cancel Current Booking
                 </a>
             </div>

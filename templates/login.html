@@ -397,7 +397,7 @@
                     <h1>ParkEase</h1>
                 </div>
 
-                <a href="{{ url_for('index') }}" class="home-btn" title="Back to Home">
+                <a href="{{ url_for('main.index') }}" class="home-btn" title="Back to Home">
                     <i class="fas fa-home"></i>
                 </a>
 
@@ -411,17 +411,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
-                <form method="POST" action="{{ url_for('login') }}" class="needs-validation" novalidate>
+                <form method="POST" action="{{ url_for('main.login') }}" class="needs-validation" novalidate>
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
+                        <label for="email" class="form-label">Email</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            {{ form.username(class="form-control", placeholder="Enter your username", id="username") }}
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            {{ form.email(class="form-control", placeholder="Enter your email", id="email") }}
                         </div>
-                        {% if form.username.errors %}
+                        {% if form.email.errors %}
                             <div class="invalid-feedback d-block">
-                                {% for error in form.username.errors %}
+                                {% for error in form.email.errors %}
                                     {{ error }}
                                 {% endfor %}
                             </div>
@@ -460,7 +460,7 @@
 
                 <div class="text-center mt-4">
                     <p class="mb-0 text-muted">Don't have an account? 
-                        <a href="{{ url_for('register') }}" class="auth-link">Create Account</a>
+                        <a href="{{ url_for('main.register') }}" class="auth-link">Create Account</a>
                     </p>
                 </div>
             </div>

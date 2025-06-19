@@ -303,6 +303,14 @@
     background-color: #1a202c !important;
     border-color: var(--primary-color) !important;
   }
+  body[data-theme="dark"] #sortSelect {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #2d3748 !important;
+  }
+  body[data-theme="dark"] .user-details label {
+    color: #fff !important;
+  }
 </style>
 {% endblock %}
 
@@ -318,6 +326,25 @@
         </div>
     </div>
 
+    <!-- Search and Sort UI -->
+    <div class="row mb-3 search-sort-mobile-stack d-flex">
+        <div class="col-md-6 mb-2">
+            <input type="text" class="form-control w-100" id="searchInput" placeholder="Search by name or email..." style="max-width: 300px;">
+        </div>
+        <div class="col-md-6 mb-2 d-flex justify-content-end">
+            <select class="form-select w-100" id="sortSelect" style="max-width: 300px;">
+                <option value="name-asc">Name: A-Z</option>
+                <option value="name-desc">Name: Z-A</option>
+                <option value="signup-asc">Signup: Oldest First</option>
+                <option value="signup-desc">Signup: Newest First</option>
+                <option value="bookings-desc">Most Bookings</option>
+                <option value="bookings-asc">Least Bookings</option>
+                <option value="spent-desc">Highest Spent</option>
+                <option value="spent-asc">Lowest Spent</option>
+            </select>
+        </div>
+    </div>
+
     <!-- Users Table -->
     <div class="row">
         <div class="col-12">
@@ -327,43 +354,7 @@
                         <i class="fas fa-users me-2"></i>Registered Users
                     </h5>
                     <div class="header-controls">
-                        <div class="search-container">
-                            <i class="fas fa-search search-icon"></i>
-                            <i class="fas fa-spinner fa-spin loading-spinner"></i>
-                            <input type="text" id="searchInput" class="search-input" placeholder="Search by name or email">
-                        </div>
-                        <div class="sort-dropdown">
-                            <button class="sort-dropdown-btn" onclick="toggleSortDropdown()">
-                                <i class="fas fa-sort"></i>
-                                Sort By
-                            </button>
-                            <div class="sort-dropdown-content" id="sortDropdown">
-                                <div class="sort-option" data-sort="signup_date" data-direction="desc">
-                                    <i class="fas fa-calendar"></i>
-                                    Newest First
-                                </div>
-                                <div class="sort-option" data-sort="signup_date" data-direction="asc">
-                                    <i class="fas fa-calendar"></i>
-                                    Oldest First
-                                </div>
-                                <div class="sort-option" data-sort="total_bookings" data-direction="desc">
-                                    <i class="fas fa-calendar-check"></i>
-                                    Most Bookings
-                                </div>
-                                <div class="sort-option" data-sort="total_bookings" data-direction="asc">
-                                    <i class="fas fa-calendar-check"></i>
-                                    Least Bookings
-                                </div>
-                                <div class="sort-option" data-sort="total_spent" data-direction="desc">
-                                    <i class="fas fa-tag"></i>
-                                    Highest Spent
-                                </div>
-                                <div class="sort-option" data-sort="total_spent" data-direction="asc">
-                                    <i class="fas fa-tag"></i>
-                                    Lowest Spent
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Search and sort UI removed for reimplementation -->
                     </div>
                 </div>
                 <div class="card-body p-4">
@@ -389,12 +380,9 @@
                                     <td class="dark-mode-text">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                     <td class="dark-mode-text">
                                         {{ user.total_bookings }}
-                                        <button type="button" class="btn btn-sm btn-info btn-action ms-2" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#reservationHistoryModal{{ user.id }}"
-                                                title="View Reservation History">
+                                        <a href="{{ url_for('admin.admin_user_reservation_history', user_id=user.id) }}" class="btn btn-sm btn-info btn-action ms-2" title="View Reservation History">
                                             <i class="fas fa-eye"></i>
-                                        </button>
+                                        </a>
                                     </td>
                                     <td class="dark-mode-text">₹{{ "%.2f"|format(user.total_spent) }}</td>
                                     <td>
@@ -427,51 +415,51 @@
 <!-- User Details Modal -->
 {% for user in users %}
 <div class="modal fade" id="userDetailsModal{{ user.id }}" tabindex="-1" aria-labelledby="userDetailsModalLabel{{ user.id }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 700px;">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title" id="userDetailsModalLabel{{ user.id }}">
-                    <i class="fas fa-user me-2"></i>User Details - {{ user.name }}
+                    <i class="fas fa-user me-2 text-primary"></i>User Details
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="user-details">
-                    <div class="detail-item">
-                        <label>Username:</label>
-                        <span>{{ user.username }}</span>
+            <div class="modal-body pt-3">
+                <div class="user-details p-3 rounded" style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                    <div class="detail-item mb-3">
+                        <label class="text-muted"><i class="fas fa-user me-2"></i>Name:</label>
+                        <span class="fw-semibold">{{ user.name }}</span>
                     </div>
-                    <div class="detail-item">
-                        <label>Email:</label>
+                    <div class="detail-item mb-3">
+                        <label class="text-muted"><i class="fas fa-envelope me-2"></i>Email:</label>
                         <span>{{ user.email }}</span>
                     </div>
-                    <div class="detail-item">
-                        <label>Address:</label>
+                    <div class="detail-item mb-3">
+                        <label class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Address:</label>
                         <span>{{ user.address or 'Not provided' }}</span>
                     </div>
-                    <div class="detail-item">
-                        <label>Pincode:</label>
+                    <div class="detail-item mb-3">
+                        <label class="text-muted"><i class="fas fa-map-pin me-2"></i>Pincode:</label>
                         <span>{{ user.pincode or 'Not provided' }}</span>
                     </div>
-                    <div class="detail-item">
-                        <label>Total Bookings:</label>
-                        <span>{{ user.total_bookings }}</span>
+                    <div class="detail-item mb-3">
+                        <label class="text-muted"><i class="fas fa-calendar-check me-2"></i>Total Bookings:</label>
+                        <span class="fw-semibold">{{ user.total_bookings }}</span>
+                    </div>
+                    <div class="detail-item mb-3">
+                        <label class="text-muted"><i class="fas fa-rupee-sign me-2"></i>Total Spent:</label>
+                        <span class="fw-semibold">₹{{ "%.2f"|format(user.total_spent) }}</span>
                     </div>
                     <div class="detail-item">
-                        <label>Total Spent:</label>
-                        <span>₹{{ user.total_spent }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <label>Joined Date:</label>
+                        <label class="text-muted"><i class="fas fa-clock me-2"></i>Joined Date:</label>
                         <span>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-0 pt-3">
+                <a href="{{ url_for('admin.admin_user_reservation_history', user_id=user.id) }}" class="btn btn-info">
+                    <i class="fas fa-history me-2"></i>View Bookings
+                </a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reservationHistoryModal{{ user.id }}">
-                    <i class="fas fa-history me-2"></i>View History
-                </button>
             </div>
         </div>
     </div>
@@ -481,7 +469,7 @@
 <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteUserModalLabel{{ user.id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}">
+            <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}">
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold" id="deleteUserModalLabel{{ user.id }}">
                         <i class="fas fa-trash me-2 text-danger"></i>Delete User
@@ -508,49 +496,6 @@
                     </button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
-
-<!-- Reservation History Modal -->
-<div class="modal fade" id="reservationHistoryModal{{ user.id }}" tabindex="-1" aria-labelledby="reservationHistoryModalLabel{{ user.id }}" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reservationHistoryModalLabel{{ user.id }}">
-                    <i class="fas fa-history me-2"></i>Reservation History - {{ user.name }}
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table table-hover reservation-history-table">
-                        <thead>
-                            <tr>
-                                <th class="min-width-150">Parking Lot</th>
-                                <th class="min-width-80">Spot ID</th>
-                                <th class="min-width-100">Vehicle No</th>
-                                <th class="min-width-150">Parked At</th>
-                                <th class="min-width-150">Left At</th>
-                                <th class="min-width-120">Duration</th>
-                                <th class="min-width-100">Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reservationHistoryTableBody{{ user.id }}">
-                            <tr>
-                                <td colspan="7" class="text-center">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
         </div>
     </div>
 </div>
@@ -618,177 +563,57 @@
 .user-details span {
     color: var(--text-color);
 }
+
+@media (max-width: 767.98px) {
+  #searchInput, #sortSelect {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .search-sort-mobile-stack {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .search-sort-mobile-stack > div {
+    width: 100% !important;
+    margin-bottom: 0.5rem;
+  }
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const table = document.getElementById('dataTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
     const searchInput = document.getElementById('searchInput');
-    const searchContainer = document.querySelector('.search-container');
-    const tableBody = document.querySelector('tbody');
-    let searchTimeout;
+    const sortSelect = document.getElementById('sortSelect');
 
-    // Function to update table with search results
-    function updateTable(users) {
-        tableBody.innerHTML = users.map(user => `
-            <tr>
-                <td class="dark-mode-text">${user.id}</td>
-                <td class="dark-mode-text">${user.name}</td>
-                <td class="dark-mode-text">${user.email}</td>
-                <td class="dark-mode-text">${user.created_at}</td>
-                <td class="dark-mode-text">${user.total_bookings}</td>
-                <td class="dark-mode-text">₹${user.total_spent.toFixed(2)}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button type="button" class="btn btn-sm btn-primary btn-action" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#userDetailsModal${user.id}"
-                                title="View Details">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-danger btn-action" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#deleteUserModal${user.id}"
-                                title="Delete User">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    // Function to perform search
-    async function performSearch(query) {
-        try {
-            searchContainer.classList.add('loading');
-            
-            // Get current sort parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const sort = urlParams.get('sort') || 'signup_date';
-            const direction = urlParams.get('direction') || 'desc';
-            
-            // Make API request
-            const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&sort=${sort}&direction=${direction}`);
-            const data = await response.json();
-            
-            if (data.success) {
-                updateTable(data.users);
-            } else {
-                console.error('Search failed:', data.error);
-            }
-        } catch (error) {
-            console.error('Search error:', error);
-        } finally {
-            searchContainer.classList.remove('loading');
+    function filterAndSort() {
+        let filtered = rows;
+        const search = searchInput.value.trim().toLowerCase();
+        if (search) {
+            filtered = rows.filter(row => {
+                const name = row.children[1].textContent.toLowerCase();
+                const email = row.children[2].textContent.toLowerCase();
+                return name.includes(search) || email.includes(search);
+            });
         }
+        // Sort
+        const val = sortSelect.value;
+        if (val === 'name-asc') filtered.sort((a, b) => a.children[1].textContent.localeCompare(b.children[1].textContent));
+        else if (val === 'name-desc') filtered.sort((a, b) => b.children[1].textContent.localeCompare(a.children[1].textContent));
+        else if (val === 'signup-asc') filtered.sort((a, b) => a.children[3].textContent.localeCompare(b.children[3].textContent));
+        else if (val === 'signup-desc') filtered.sort((a, b) => b.children[3].textContent.localeCompare(a.children[3].textContent));
+        else if (val === 'bookings-desc') filtered.sort((a, b) => parseInt(b.children[4].textContent) - parseInt(a.children[4].textContent));
+        else if (val === 'bookings-asc') filtered.sort((a, b) => parseInt(a.children[4].textContent) - parseInt(b.children[4].textContent));
+        else if (val === 'spent-desc') filtered.sort((a, b) => parseFloat(b.children[5].textContent.replace(/[^\d.]/g, '')) - parseFloat(a.children[5].textContent.replace(/[^\d.]/g, '')));
+        else if (val === 'spent-asc') filtered.sort((a, b) => parseFloat(a.children[5].textContent.replace(/[^\d.]/g, '')) - parseFloat(b.children[5].textContent.replace(/[^\d.]/g, '')));
+        // Render
+        tbody.innerHTML = '';
+        filtered.forEach(row => tbody.appendChild(row));
     }
-
-    // Add input event listener with debounce
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        const query = this.value.trim();
-        
-        if (query.length >= 2) {
-            searchTimeout = setTimeout(() => performSearch(query), 300);
-        } else if (query.length === 0) {
-            // Reset to initial state if search is cleared
-            const url = new URL(window.location.href);
-            url.searchParams.delete('q');
-            window.location.href = url.toString();
-        }
-    });
-
-    const sortDropdown = document.getElementById('sortDropdown');
-    const sortOptions = sortDropdown.querySelectorAll('.sort-option');
-    
-    // Get current sort from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentSort = urlParams.get('sort') || 'signup_date';
-    const currentDirection = urlParams.get('direction') || 'desc';
-    
-    // Set active sort option
-    sortOptions.forEach(option => {
-        if (option.dataset.sort === currentSort && option.dataset.direction === currentDirection) {
-            option.classList.add('active');
-        }
-        
-        option.addEventListener('click', () => {
-            const url = new URL(window.location.href);
-            url.searchParams.set('sort', option.dataset.sort);
-            url.searchParams.set('direction', option.dataset.direction);
-            window.location.href = url.toString();
-        });
-    });
-
-    // Handle reservation history modal
-    const reservationModals = document.querySelectorAll('[id^="reservationHistoryModal"]');
-    reservationModals.forEach(modal => {
-        modal.addEventListener('show.bs.modal', async function() {
-            const userId = this.id.replace('reservationHistoryModal', '');
-            const tableBody = document.getElementById(`reservationHistoryTableBody${userId}`);
-            
-            try {
-                const response = await fetch(`/api/admin/user/${userId}/reservations`);
-                const data = await response.json();
-                
-                if (data.reservations) {
-                    if (data.reservations.length === 0) {
-                        tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="7" class="text-center text-muted">
-                                    No reservation history found
-                                </td>
-                            </tr>
-                        `;
-                    } else {
-                        tableBody.innerHTML = data.reservations.map(reservation => `
-                            <tr>
-                                <td>${reservation.parking_lot}</td>
-                                <td>${reservation.spot_id}</td>
-                                <td>${reservation.vehicle_number}</td>
-                                <td>${reservation.parked_at || 'N/A'}</td>
-                                <td>${reservation.left_at || 'N/A'}</td>
-                                <td>${reservation.duration || 'N/A'}</td>
-                                <td>${reservation.cost || 'N/A'}</td>
-                            </tr>
-                        `).join('');
-                    }
-                } else {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="7" class="text-center text-danger">
-                                Failed to load reservation history
-                            </td>
-                        </tr>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error fetching reservations:', error);
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center text-danger">
-                            Error loading reservation history
-                        </td>
-                    </tr>
-                `;
-            }
-        });
-    });
-});
-
-function toggleSortDropdown() {
-    const dropdown = document.getElementById('sortDropdown');
-    dropdown.classList.toggle('show');
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('sortDropdown');
-    const sortBtn = document.querySelector('.sort-dropdown-btn');
-    
-    if (!sortBtn.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.remove('show');
-    }
+    searchInput.addEventListener('input', filterAndSort);
+    sortSelect.addEventListener('change', filterAndSort);
 });
 </script>
 {% endblock %}

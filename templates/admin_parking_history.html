@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Parking History - ParkEase{% endblock %}
+{% block content %}
+<style>
+body[data-theme="dark"] .parking-history-subtext {
+  color: #fff !important;
+}
+body[data-theme="dark"] .btn-primary, body[data-theme="dark"] .form-select {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #2d3748 !important;
+}
+</style>
+<div class="container-fluid px-4 px-md-5 py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold mb-2" style="color: var(--primary-color);">
+                <i class="fas fa-history me-2"></i>Parking History
+            </h2>
+            <p class="text-muted dark-mode-text parking-history-subtext">Complete log of all reservations ever made.</p>
+        </div>
+    </div>
+    <!-- Filters -->
+    <form method="get" class="row g-3 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="lot_id" class="form-label">Parking Lot</label>
+            <select class="form-select" id="lot_id" name="lot_id">
+                <option value="">All Lots</option>
+                {% for lot in lots %}
+                <option value="{{ lot.id }}" {% if selected_lot and lot.id == selected_lot %}selected{% endif %}>{{ lot.prime_location_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="date_from" class="form-label">From Date</label>
+            <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from or '' }}">
+        </div>
+        <div class="col-md-3">
+            <label for="date_to" class="form-label">To Date</label>
+            <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to or '' }}">
+        </div>
+        <div class="col-md-2">
+            <label for="month" class="form-label">Month</label>
+            <select class="form-select" id="month" name="month">
+                <option value="">All</option>
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}" {% if month and m == month|int %}selected{% endif %}>{{ m }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label for="year" class="form-label">Year</label>
+            <input type="number" class="form-control" id="year" name="year" min="2000" max="2100" value="{{ year or '' }}">
+        </div>
+        <div class="col-md-12 d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i>Apply Filters</button>
+        </div>
+    </form>
+    <!-- Table -->
+    <div class="card bg-white dark-mode-card rounded shadow">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table admin-table" id="historyTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Parking Lot</th>
+                            <th>Spot ID</th>
+                            <th>User</th>
+                            <th>Vehicle No</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if reservations|length == 0 %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No reservation history found.</td>
+                        </tr>
+                        {% else %}
+                        {% for reservation, spot, lot, user in reservations %}
+                        <tr>
+                            <td>{{ lot.prime_location_name }}</td>
+                            <td>{{ spot.id }}</td>
+                            <td>{{ user.name if user else 'Deleted User' }}</td>
+                            <td>{{ reservation.vehicle_number or 'N/A' }}</td>
+                            <td>{{ format_ist_datetime(reservation.parking_timestamp) }}</td>
+                            <td>{{ format_ist_datetime(reservation.leaving_timestamp) }}</td>
+                            <td>₹{{ reservation.parking_cost or 'Pending' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

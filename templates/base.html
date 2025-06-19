@@ -435,13 +435,41 @@
             transform: translateY(-2px);
             border-color: rgba(255, 255, 255, 0.2);
         }
+
+        @media (max-width: 991.98px) {
+            .manage-dropdown .dropdown-menu {
+                position: static !important;
+                float: none;
+                width: 100%;
+                margin-top: 0;
+                box-shadow: none;
+                background: var(--card-bg);
+            }
+        }
+        .manage-dropdown .dropdown-menu {
+            min-width: 220px;
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+        .manage-dropdown .dropdown-item {
+            color: var(--text-color);
+            font-size: 1rem;
+            padding: 0.75rem 1.25rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .manage-dropdown .dropdown-item:hover, .manage-dropdown .dropdown-item:focus {
+            background: var(--primary-color);
+            color: #fff;
+        }
     </style>
     {% block head %}{% endblock %}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
                 <i class="fas fa-parking"></i>
                 ParkEase
             </a>
@@ -458,38 +486,38 @@
                     {% if current_user.is_authenticated %}
                         {% if session.get('user_type') == 'admin' %}
                             <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('admin_dashboard') }}">
+                                <a class="nav-link px-3" href="{{ url_for('admin.admin_dashboard') }}">
                                     <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('admin_parking_lots') }}">
+                                <a class="nav-link px-3" href="{{ url_for('admin.admin_parking_lots') }}">
                                     <i class="fas fa-map-marked-alt me-1"></i>Parking Lots
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('admin_occupied_spots') }}">
-                                    <i class="fas fa-car me-1"></i>Occupied Spots
+                            <li class="nav-item dropdown manage-dropdown">
+                                <a class="nav-link px-3 dropdown-toggle" href="#" id="manageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cogs me-1"></i>Manage
                                 </a>
+                                <ul class="dropdown-menu" aria-labelledby="manageDropdown">
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.occupied_spots') }}"><i class="fas fa-car me-1"></i>Occupied Spots</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.admin_users') }}"><i class="fas fa-users me-1"></i>Users</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.parking_history') }}"><i class="fas fa-history me-1"></i>Parking History</a></li>
+                                </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('admin_users') }}">
-                                    <i class="fas fa-users me-1"></i>Users
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('logout') }}">
+                                <a class="nav-link px-3" href="{{ url_for('main.logout') }}">
                                     <i class="fas fa-sign-out-alt me-1"></i>Logout
                                 </a>
                             </li>
                         {% else %}
                             <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('user_dashboard') }}">
+                                <a class="nav-link px-3" href="{{ url_for('user.user_dashboard') }}">
                                     <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('user_parking_lots') }}" style="color: #fff;">
+                                <a class="nav-link px-3" href="{{ url_for('user.user_parking_lots') }}" style="color: #fff;">
                                     <i class="fas fa-car-side me-1"></i>Book Parking
                                 </a>
                             </li>
@@ -501,18 +529,18 @@
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userProfileDropdown">
                                     <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editProfileModal"><i class="fas fa-user-edit me-2"></i>Edit Profile</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                                 </ul>
                             </li>
                         {% endif %}
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link px-3" href="{{ url_for('login') }}">
+                            <a class="nav-link px-3" href="{{ url_for('main.login') }}">
                                 <i class="fas fa-sign-in-alt me-1"></i>Login
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-3" href="{{ url_for('register') }}">
+                            <a class="nav-link px-3" href="{{ url_for('main.register') }}">
                                 <i class="fas fa-user-plus me-1"></i>Register
                             </a>
                         </li>
@@ -527,7 +555,7 @@
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
             <div class="modal-content">
-                <form id="editProfileForm" method="POST" action="{{ url_for('edit_profile') }}">
+                <form id="editProfileForm" method="POST" action="{{ url_for('user.edit_profile') }}">
                     <div class="modal-header border-0 pb-0">
                         <h5 class="modal-title fw-bold" id="editProfileModalLabel">
                             <i class="fas fa-user-edit me-2 text-primary"></i>Edit Profile
@@ -604,11 +632,11 @@
                 <div class="footer-section">
                     <h5>Quick Links</h5>
                     <ul>
-                        <li><a href="{{ url_for('index') }}">Home</a></li>
-                        <li><a href="{{ url_for('login') }}">Login</a></li>
-                        <li><a href="{{ url_for('register') }}">Register</a></li>
+                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                        <li><a href="{{ url_for('main.login') }}">Login</a></li>
+                        <li><a href="{{ url_for('main.register') }}">Register</a></li>
                         {% if current_user.is_authenticated %}
-                            <li><a href="{{ url_for('user_dashboard' if session.get('user_type') == 'user' else 'admin_dashboard') }}">Dashboard</a></li>
+                            <li><a href="{{ url_for('user.user_dashboard' if session.get('user_type') == 'user' else 'admin.admin_dashboard') }}">Dashboard</a></li>
                         {% endif %}
                     </ul>
                 </div>
@@ -617,7 +645,7 @@
                     <ul>
                         <li><i class="fas fa-map-marker-alt me-2"></i>Tower B, Sector 63, Noida, UP – 201301</li>
                         <li><i class="fas fa-phone me-2"></i>+91 77059-76390</li>
-                        <li><i class="fas fa-envelope me-2"></i>support@parkease.in</li>
+                        <li><i class="fas fa-envelope me-2"></i>support@parkease.com</li>
                     </ul>
                 </div>
             </div>
@@ -659,6 +687,34 @@
             }
             // Dispatch theme change event for components that need to update
             document.dispatchEvent(new Event('themeChanged'));
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var manageDropdown = document.getElementById('manageDropdown');
+            var dropdownMenu = manageDropdown && manageDropdown.nextElementSibling;
+            if (manageDropdown && dropdownMenu) {
+                // Open on hover (desktop)
+                manageDropdown.parentElement.addEventListener('mouseenter', function() {
+                    if (window.innerWidth > 991) {
+                        dropdownMenu.classList.add('show');
+                        manageDropdown.setAttribute('aria-expanded', 'true');
+                    }
+                });
+                manageDropdown.parentElement.addEventListener('mouseleave', function() {
+                    if (window.innerWidth > 991) {
+                        dropdownMenu.classList.remove('show');
+                        manageDropdown.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                // Open on click (mobile)
+                manageDropdown.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 991) {
+                        e.preventDefault();
+                        dropdownMenu.classList.toggle('show');
+                        manageDropdown.setAttribute('aria-expanded', dropdownMenu.classList.contains('show'));
+                    }
+                });
+            }
         });
     </script>
     {% block scripts %}{% endblock %}

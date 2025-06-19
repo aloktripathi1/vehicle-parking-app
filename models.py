@@ -9,7 +9,6 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     name = db.Column(db.String(100), nullable=False)
@@ -22,32 +21,37 @@ class User(UserMixin, db.Model):
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-        print(f"Password hash generated for user {self.username}")
+        print(f"Password hash generated for user {self.email}")
     
     def check_password(self, password):
         result = check_password_hash(self.password_hash, password)
-        print(f"Password check for user {self.username}: {'success' if result else 'failed'}")
+        print(f"Password check for user {self.email}: {'success' if result else 'failed'}")
         return result
     
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.email}>'
 
 class Admin(UserMixin, db.Model):
     __tablename__ = 'admins'
     
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+    name = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_type = db.Column(db.String(20), default='admin')
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+        print(f"Password hash generated for admin {self.email}")
     
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        result = check_password_hash(self.password_hash, password)
+        print(f"Password check for admin {self.email}: {'success' if result else 'failed'}")
+        return result
     
     def __repr__(self):
-        return f'<Admin {self.username}>'
+        return f'<Admin {self.email}>'
 
 class ParkingLot(db.Model):
     __tablename__ = 'parking_lots'

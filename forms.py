@@ -2,11 +2,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FloatField, IntegerField, SelectField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, ValidationError, Regexp
 from models import User, Admin
+from werkzeug.security import check_password_hash
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[
+    email = StringField('Email', validators=[
         DataRequired(),
-        Length(min=3, max=20)
+        Email()
     ])
     password = PasswordField('Password', validators=[
         DataRequired(),
@@ -19,29 +20,19 @@ class LoginForm(FlaskForm):
         if not super().validate(extra_validators=extra_validators):
             return False
             
-        # Check if user exists
-        user = User.query.filter_by(username=self.username.data).first()
-        admin = Admin.query.filter_by(username=self.username.data).first()
-        
-        if not user and not admin:
-            self.username.errors.append('Invalid username')
-            return False
+        admin = Admin.query.filter_by(email=self.email.data).first()
+        if admin and check_password_hash(admin.password_hash, self.password.data):
+            return True
             
-        # Check password
-        if user and not user.check_password(self.password.data):
-            self.password.errors.append('Invalid password')
-            return False
-        if admin and not admin.check_password(self.password.data):
-            self.password.errors.append('Invalid password')
-            return False
+        user = User.query.filter_by(email=self.email.data).first()
+        if user and check_password_hash(user.password_hash, self.password.data):
+            return True
             
-        return True
+        self.email.errors.append('Invalid email or password')
+        self.password.errors.append('Invalid email or password')
+        return False
 
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(),
-        Length(min=3, max=20)
-    ])
     name = StringField('Full Name', validators=[
         DataRequired(),
         Length(min=2, max=100)
@@ -59,11 +50,6 @@ class RegisterForm(FlaskForm):
         EqualTo('password')
     ])
     submit = SubmitField('Create Account')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('Username already taken. Please choose a different one.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
