@@ -446,72 +446,70 @@
                 <form method="POST" action="{{ url_for('main.register') }}" class="needs-validation" novalidate>
                     {{ form.hidden_tag() }}
                     
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Full Name</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                {{ form.name(class="form-control", placeholder="Enter your full name") }}
-                            </div>
-                            {% if form.name.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.name.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            {{ form.name(class="form-control", placeholder="Enter your full name") }}
                         </div>
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                {{ form.email(class="form-control", placeholder="Enter your email") }}
-                            </div>
-                            {% if form.email.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.email.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            {{ form.email(class="form-control", placeholder="Enter your email") }}
                         </div>
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
-                        <div class="col-md-6">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group password-input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                {{ form.password(class="form-control", placeholder="Create a password", id="passwordInput", autocomplete="new-password") }}
-                                <button class="password-toggle" type="button" id="togglePassword" tabindex="-1">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            {% if form.password.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.password.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group password-input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            {{ form.password(class="form-control", placeholder="Create a password", id="passwordInput", autocomplete="new-password") }}
+                            <button class="password-toggle" type="button" id="togglePassword" tabindex="-1">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
-                        <div class="col-md-6">
-                            <label for="confirm_password" class="form-label">Confirm Password</label>
-                            <div class="input-group password-input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                {{ form.confirm_password(class="form-control", placeholder="Confirm your password", id="confirmPasswordInput", autocomplete="new-password") }}
-                                <button class="password-toggle" type="button" id="toggleConfirmPassword" tabindex="-1">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            {% if form.confirm_password.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.confirm_password.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <div class="input-group password-input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            {{ form.confirm_password(class="form-control", placeholder="Confirm your password", id="confirmPasswordInput", autocomplete="new-password") }}
+                            <button class="password-toggle" type="button" id="toggleConfirmPassword" tabindex="-1">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
+                        {% if form.confirm_password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.confirm_password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="d-grid mt-4">
