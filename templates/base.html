@@ -867,8 +867,6 @@
                             {% endfor %}
                         {% endif %}
                     {% endwith %}
-
-                    {% block content %}{% endblock %}
                 </div>
             </div>
         </div>
@@ -946,6 +944,8 @@
 
             {% block content %}{% endblock %}
         </div>
+    {% else %}
+        {% block content %}{% endblock %}
     {% endif %}
 
     {% if request.endpoint == 'main.index' %}
