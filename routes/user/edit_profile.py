@@ -27,4 +27,4 @@ def edit_profile():
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return {'success': False, 'message': 'An error occurred while updating profile'}
     
-    return render_template('edit_profile.html', user=current_user) 
+    return render_template('user/edit_profile.html', user=current_user) 

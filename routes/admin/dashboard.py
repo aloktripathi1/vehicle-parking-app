@@ -61,7 +61,7 @@ def admin_dashboard():
                 'revenue': lot_revenue
             })
         chart_data = lot_data 
-        return render_template('admin_dashboard.html',
+        return render_template('admin/admin_dashboard.html',
             total_revenue=round(total_revenue, 2),
             revenue_change=round(revenue_change, 2),
             revenue_change_percent=round(revenue_change_percent, 1),

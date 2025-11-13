@@ -41,4 +41,4 @@ def edit_parking_lot(lot_id):
             db.session.rollback()
             flash('An error occurred while updating the parking lot', 'danger')
     
-    return render_template('edit_parking_lot.html', form=form, parking_lot=lot) 
+    return render_template('admin/edit_parking_lot.html', form=form, parking_lot=lot) 

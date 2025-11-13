@@ -28,7 +28,7 @@ def login():
                 for error in errors:
                     flash(f'{field.title()}: {error}', 'danger')
     
-    return render_template('login.html', form=form)
+    return render_template('main/login.html', form=form)
 
 @main_bp.route('/logout')
 @login_required

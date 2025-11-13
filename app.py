@@ -70,7 +70,7 @@ with app.app_context():
 @app.errorhandler(500)
 def internal_error(error):
     app.logger.error('Server Error: %s', (traceback.format_exc()))
-    return render_template('error.html', error=str(error), traceback=traceback.format_exc()), 500
+    return render_template('main/error.html', error=str(error), traceback=traceback.format_exc()), 500
 
 @login_manager.user_loader
 def load_user(user_id):

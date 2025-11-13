@@ -8,4 +8,4 @@ import json
 @main_bp.route('/')
 def index():
     available_spots = ParkingSpot.query.filter_by(status='A').count()
-    return render_template('index.html', available_spots=available_spots) 
+    return render_template('main/index.html', available_spots=available_spots) 

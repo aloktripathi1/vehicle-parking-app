@@ -49,7 +49,7 @@ def parking_history():
     reservations = query.order_by(Reservation.parking_timestamp.desc()).all()
     lots = ParkingLot.query.order_by(ParkingLot.prime_location_name).all()
 
-    return render_template('admin_parking_history.html',
+    return render_template('admin/admin_parking_history.html',
         reservations=reservations,
         lots=lots,
         selected_lot=lot_id,

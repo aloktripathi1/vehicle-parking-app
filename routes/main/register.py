@@ -27,6 +27,6 @@ def register():
         except Exception as e:
             db.session.rollback()
             flash('An error occurred during registration. Please try again.', 'danger')
-            return render_template('register.html', form=form)
+            return render_template('main/register.html', form=form)
             
-    return render_template('register.html', form=form) 
+    return render_template('main/register.html', form=form) 

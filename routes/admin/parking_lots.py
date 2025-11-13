@@ -55,4 +55,4 @@ def admin_parking_lots():
     for lot in parking_lots:
         revenue = db.session.query(func.sum(ParkingSpot.reservations.property.mapper.class_.parking_cost)).join(ParkingSpot).filter(ParkingSpot.lot_id == lot.id).scalar() or 0
         lot_revenues[lot.id] = revenue
-    return render_template('admin_parking_lots.html', form=form, parking_lots=parking_lots, lot_revenues=lot_revenues) 
+    return render_template('admin/admin_parking_lots.html', form=form, parking_lots=parking_lots, lot_revenues=lot_revenues) 

@@ -17,4 +17,4 @@ def user_parking_lots():
         spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='A').all()
         available_spots[lot.id] = len(spots)
         available_spot_ids[lot.id] = [spot.id for spot in spots]
-    return render_template('user_parking_lots.html', parking_lots=parking_lots, available_spots=available_spots, available_spot_ids=available_spot_ids) 
+    return render_template('user/user_parking_lots.html', parking_lots=parking_lots, available_spots=available_spots, available_spot_ids=available_spot_ids) 

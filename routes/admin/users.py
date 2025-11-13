@@ -42,7 +42,7 @@ def admin_users():
             ).first()
             active_bookings[user.id] = active_booking
         
-        return render_template('admin_users.html',
+        return render_template('admin/admin_users.html',
             users=users,
             active_bookings=active_bookings)
             
@@ -71,7 +71,7 @@ def admin_user_reservation_history(user_id):
         ).order_by(
             Reservation.parking_timestamp.desc()
         ).all()
-        return render_template('admin_user_reservations.html', user=user, reservations=reservations)
+        return render_template('admin/admin_user_reservations.html', user=user, reservations=reservations)
     except Exception as e:
         print('Admin user reservation history error:', e)
         traceback.print_exc()

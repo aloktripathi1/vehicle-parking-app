@@ -66,7 +66,7 @@ def user_dashboard():
             'costs': [float(r[0].parking_cost or 0) for r in reservation_history[-5:]]
         }
         
-        return render_template('user_dashboard.html',
+        return render_template('user/user_dashboard.html',
             active_reservation=active_reservation,
             profile_complete=profile_complete,
             reservation_history=reservation_history,

@@ -29,7 +29,7 @@ def occupied_spots():
             occupied_spots.append((spot, lot, reservation, user))
             
         now = datetime.utcnow()
-        return render_template('admin_occupied_spots.html', occupied_spots=occupied_spots, now=now)
+        return render_template('admin/admin_occupied_spots.html', occupied_spots=occupied_spots, now=now)
             
     except Exception as e:
         print('Admin occupied spots error:', e)
