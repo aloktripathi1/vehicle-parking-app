@@ -11,17 +11,12 @@ import json
 import math
 from sqlalchemy import func, inspect
 from sqlalchemy import or_
-import traceback
 from utils import format_ist_datetime, utc_to_ist
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'I am Alok Tripathi and this is my secret key!')
 
-try:
-    os.makedirs(app.instance_path)
-except OSError:
-    pass
-
+os.makedirs(app.instance_path, exist_ok=True)
 db_path = os.path.join(app.instance_path, 'database.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -78,8 +73,7 @@ with app.app_context():
 
 @app.errorhandler(500)
 def internal_error(error):
-    app.logger.error('Server Error: %s', (traceback.format_exc()))
-    return render_template('main/error.html', error=str(error), traceback=traceback.format_exc()), 500
+        return render_template('main/error.html', error=str(error)), 500
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -87,43 +81,32 @@ def load_user(user_id):
 
 def has_active_booking(user_id):
     """Check if user has any active bookings"""
-    try:
-        active_statuses = ['active', 'booked', 'in-progress']
-        active_booking = Reservation.query.filter(
-            Reservation.user_id == user_id,
-            Reservation.status.in_(active_statuses)
-        ).first()
-        return active_booking is not None
-    except Exception as e:
-        print(f"Error checking active bookings: {e}")
-        return False
-
+    active_statuses = ['active', 'booked', 'in-progress']
+    active_booking = Reservation.query.filter(
+        Reservation.user_id == user_id,
+        Reservation.status.in_(active_statuses)
+    ).first()
+    return active_booking is not None
 def verify_spot_statuses(lot_id):
-    try:
-        spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
+    spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
         
-        active_reservations = Reservation.query.filter(
-            Reservation.spot_id.in_([spot.id for spot in spots]),
-            Reservation.leaving_timestamp.is_(None)).all()
+    active_reservations = Reservation.query.filter(
+        Reservation.spot_id.in_([spot.id for spot in spots]),
+        Reservation.leaving_timestamp.is_(None)).all()
         
-        occupied_spot_ids = {res.spot_id for res in active_reservations}
+    occupied_spot_ids = {res.spot_id for res in active_reservations}
         
-        for spot in spots:
-            should_be_occupied = spot.id in occupied_spot_ids
-            if should_be_occupied and spot.status != 'O':
-                app.logger.warning(f"Fixing spot {spot.id} status from {spot.status} to O")
-                spot.status = 'O'
-            elif not should_be_occupied and spot.status != 'A':
-                app.logger.warning(f"Fixing spot {spot.id} status from {spot.status} to A")
-                spot.status = 'A'
+    for spot in spots:
+        should_be_occupied = spot.id in occupied_spot_ids
+        if should_be_occupied and spot.status != 'O':
+            app.logger.warning(f"Fixing spot {spot.id} status from {spot.status} to O")
+            spot.status = 'O'
+        elif not should_be_occupied and spot.status != 'A':
+            app.logger.warning(f"Fixing spot {spot.id} status from {spot.status} to A")
+            spot.status = 'A'
         
-        db.session.commit()
-        return True
-    except Exception as e:
-        app.logger.error(f"Error verifying spot statuses: {str(e)}")
-        db.session.rollback()
-        return False
-
+    db.session.commit()
+    return True
 if __name__ == '__main__':
     app.run(debug=True)
     

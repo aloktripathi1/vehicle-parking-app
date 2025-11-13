@@ -8,25 +8,19 @@ from forms import RegisterForm
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        try:
-            user = User(
-                email=form.email.data,
-                name=form.name.data,
-                address='', 
-                pincode=''  
-            )
-            user.set_password(form.password.data)
-            db.session.add(user)
-            db.session.commit()
+        user = User(
+            email=form.email.data,
+            name=form.name.data,
+            address='', 
+            pincode=''  
+        )
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
             
-            login_user(user)
-            session['user_type'] = 'user'
-            flash('Registration successful! Welcome to ParkEase.', 'success')
-            return redirect(url_for('user.user_dashboard'))
-            
-        except Exception as e:
-            db.session.rollback()
-            flash('An error occurred during registration. Please try again.', 'danger')
-            return render_template('main/register.html', form=form)
+        login_user(user)
+        session['user_type'] = 'user'
+        flash('Registration successful! Welcome to ParkEase.', 'success')
+        return redirect(url_for('user.user_dashboard'))
             
     return render_template('main/register.html', form=form) 

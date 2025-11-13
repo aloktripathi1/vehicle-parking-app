@@ -9,13 +9,9 @@ def delete_user(user_id):
     if session.get('user_type') != 'admin':
         return jsonify({'success': False, 'message': 'Access denied'})
     
-    try:
-        user = User.query.get_or_404(user_id)
-        db.session.delete(user)
-        db.session.commit()
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
         
-        return jsonify({'success': True, 'message': 'User deleted successfully'})
+    return jsonify({'success': True, 'message': 'User deleted successfully'})
         
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)}) 

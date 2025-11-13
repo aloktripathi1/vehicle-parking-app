@@ -15,33 +15,27 @@ def admin_parking_lots():
     
     form = ParkingLotForm()
     if form.validate_on_submit():
-        try:
-            lot = ParkingLot(
-                prime_location_name=form.prime_location_name.data,
-                address=form.address.data,
-                pincode=form.pincode.data,
-                max_spots=form.max_spots.data,
-                price=form.price.data
+        lot = ParkingLot(
+            prime_location_name=form.prime_location_name.data,
+            address=form.address.data,
+            pincode=form.pincode.data,
+            max_spots=form.max_spots.data,
+            price=form.price.data
+        )
+        db.session.add(lot)
+        db.session.commit()
+            
+        for i in range(lot.max_spots):
+            spot = ParkingSpot(
+                lot_id=lot.id,
+                status='A'
             )
-            db.session.add(lot)
-            db.session.commit()
+            db.session.add(spot)
             
-            for i in range(lot.max_spots):
-                spot = ParkingSpot(
-                    lot_id=lot.id,
-                    status='A'
-                )
-                db.session.add(spot)
+        db.session.commit()
+        flash('Parking lot added successfully!', 'success')
+        return redirect(url_for('admin.admin_parking_lots'))
             
-            db.session.commit()
-            flash('Parking lot added successfully!', 'success')
-            return redirect(url_for('admin.admin_parking_lots'))
-            
-        except Exception as e:
-            print('Admin add parking lot error:', e)
-            traceback.print_exc()
-            flash('An error occurred while adding the parking lot', 'danger')
-    
     parking_lots_query = db.session.query(
         ParkingLot, func.count(ParkingSpot.id).label('total_spots'),
         func.sum(case((ParkingSpot.status == 'O', 1), else_=0)).label('occupied_spots')

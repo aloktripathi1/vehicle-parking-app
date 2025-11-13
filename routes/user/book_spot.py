@@ -48,45 +48,40 @@ def book_spot_page(lot_id):
 @user_bp.route('/book_spot', methods=['POST'])
 @login_required
 def book_spot():
-    try:
-        spot_id = request.form.get('spot_id')
-        if not spot_id:
-            flash('No spot selected', 'danger')
-            return redirect(url_for('user.parking_lots'))
+    spot_id = request.form.get('spot_id')
+    if not spot_id:
+        flash('No spot selected', 'danger')
+        return redirect(url_for('user.parking_lots'))
         
-        spot = ParkingSpot.query.get(spot_id)
-        if not spot:
-            flash('Invalid spot', 'danger')
-            return redirect(url_for('user.parking_lots'))
+    spot = ParkingSpot.query.get(spot_id)
+    if not spot:
+        flash('Invalid spot', 'danger')
+        return redirect(url_for('user.parking_lots'))
         
-        if spot.status != 'A':
-            flash('Spot is not available', 'danger')
-            return redirect(url_for('user.parking_lots'))
+    if spot.status != 'A':
+        flash('Spot is not available', 'danger')
+        return redirect(url_for('user.parking_lots'))
         
-        active_booking = Reservation.query.filter_by(
-            user_id=current_user.id,
-            leaving_timestamp=None
-        ).first()
+    active_booking = Reservation.query.filter_by(
+        user_id=current_user.id,
+        leaving_timestamp=None
+    ).first()
         
-        if active_booking:
-            flash('You already have an active booking', 'danger')
-            return redirect(url_for('user.user_dashboard'))
-        
-        reservation = Reservation(
-            user_id=current_user.id,
-            spot_id=spot.id,
-            parking_timestamp=datetime.utcnow(),
-            vehicle_number=request.form.get('vehicle_number')
-        )
-        
-        spot.status = 'O'
-        db.session.add(reservation)
-        db.session.commit()
-        
-        flash('Spot booked successfully!', 'success')
+    if active_booking:
+        flash('You already have an active booking', 'danger')
         return redirect(url_for('user.user_dashboard'))
         
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error booking spot: {str(e)}', 'danger')
-        return redirect(url_for('user.parking_lots')) 
+    reservation = Reservation(
+        user_id=current_user.id,
+        spot_id=spot.id,
+        parking_timestamp=datetime.utcnow(),
+        vehicle_number=request.form.get('vehicle_number')
+    )
+        
+    spot.status = 'O'
+    db.session.add(reservation)
+    db.session.commit()
+        
+    flash('Spot booked successfully!', 'success')
+    return redirect(url_for('user.user_dashboard'))
+        

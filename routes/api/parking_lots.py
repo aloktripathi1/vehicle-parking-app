@@ -7,29 +7,26 @@ from sqlalchemy import func, case
 @api_bp.route('/parking-lots')
 @login_required
 def api_parking_lots():
-    try:
-        lots = db.session.query(
-            ParkingLot,
-            func.count(ParkingSpot.id).label('total_spots'),
-            func.sum(case((ParkingSpot.status == 'O', 1), else_=0)).label('occupied_spots')
-        ).outerjoin(
-            ParkingSpot, ParkingLot.id == ParkingSpot.lot_id
-        ).group_by(
-            ParkingLot.id
-        ).all()
+    lots = db.session.query(
+        ParkingLot,
+        func.count(ParkingSpot.id).label('total_spots'),
+        func.sum(case((ParkingSpot.status == 'O', 1), else_=0)).label('occupied_spots')
+    ).outerjoin(
+        ParkingSpot, ParkingLot.id == ParkingSpot.lot_id
+    ).group_by(
+        ParkingLot.id
+    ).all()
         
-        return jsonify({
-            'success': True,
-            'data': [{
-                'id': lot[0].id,
-                'name': lot[0].prime_location_name,
-                'address': lot[0].address,
-                'pincode': lot[0].pincode,
-                'total_spots': lot[1],
-                'occupied_spots': lot[2],
-                'available_spots': lot[1] - lot[2]
-            } for lot in lots]
-        })
+    return jsonify({
+        'success': True,
+        'data': [{
+            'id': lot[0].id,
+            'name': lot[0].prime_location_name,
+            'address': lot[0].address,
+            'pincode': lot[0].pincode,
+            'total_spots': lot[1],
+            'occupied_spots': lot[2],
+            'available_spots': lot[1] - lot[2]
+        } for lot in lots]
+    })
         
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}) 

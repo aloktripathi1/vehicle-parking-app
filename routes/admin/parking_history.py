@@ -26,26 +26,16 @@ def parking_history():
     if lot_id:
         query = query.filter(ParkingLot.id == lot_id)
     if date_from:
-        try:
-            date_from_dt = datetime.strptime(date_from, '%Y-%m-%d')
-            query = query.filter(Reservation.parking_timestamp >= date_from_dt)
-        except Exception:
-            pass
+        date_from_dt = datetime.strptime(date_from, '%Y-%m-%d')
+        query = query.filter(Reservation.parking_timestamp >= date_from_dt)
     if date_to:
-        try:
-            date_to_dt = datetime.strptime(date_to, '%Y-%m-%d')
-            query = query.filter(Reservation.parking_timestamp <= date_to_dt)
-        except Exception:
-            pass
+        date_to_dt = datetime.strptime(date_to, '%Y-%m-%d')
+        query = query.filter(Reservation.parking_timestamp <= date_to_dt)
     if month and year:
-        try:
-            month = int(month)
-            year = int(year)
-            query = query.filter(db.extract('month', Reservation.parking_timestamp) == month)
-            query = query.filter(db.extract('year', Reservation.parking_timestamp) == year)
-        except Exception:
-            pass
-
+        month = int(month)
+        year = int(year)
+        query = query.filter(db.extract('month', Reservation.parking_timestamp) == month)
+        query = query.filter(db.extract('year', Reservation.parking_timestamp) == year)
     reservations = query.order_by(Reservation.parking_timestamp.desc()).all()
     lots = ParkingLot.query.order_by(ParkingLot.prime_location_name).all()
 

@@ -9,30 +9,25 @@ def delete_parking_lot(lot_id):
     if session.get('user_type') != 'admin':
         return jsonify({'success': False, 'message': 'Access denied'})
     
-    try:
-        lot = ParkingLot.query.get_or_404(lot_id)
+    lot = ParkingLot.query.get_or_404(lot_id)
         
-        occupied_spots = ParkingSpot.query.filter_by(
-            lot_id=lot_id,
-            status='O'
-        ).first()
+    occupied_spots = ParkingSpot.query.filter_by(
+        lot_id=lot_id,
+        status='O'
+    ).first()
         
-        if occupied_spots:
-            flash('Cannot delete parking lot with occupied spots', 'danger')
-            return redirect(url_for('admin.admin_parking_lots'))
-        
-        spot_ids = [spot.id for spot in ParkingSpot.query.filter_by(lot_id=lot_id).all()]
-        if spot_ids:
-            Reservation.query.filter(Reservation.spot_id.in_(spot_ids)).delete(synchronize_session=False)
-        ParkingSpot.query.filter_by(lot_id=lot_id).delete()
-        
-        db.session.delete(lot)
-        db.session.commit()
-        
-        flash('Parking lot deleted successfully', 'success')
+    if occupied_spots:
+        flash('Cannot delete parking lot with occupied spots', 'danger')
         return redirect(url_for('admin.admin_parking_lots'))
         
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error deleting parking lot: {str(e)}', 'danger')
-        return redirect(url_for('admin.admin_parking_lots')) 
+    spot_ids = [spot.id for spot in ParkingSpot.query.filter_by(lot_id=lot_id).all()]
+    if spot_ids:
+        Reservation.query.filter(Reservation.spot_id.in_(spot_ids)).delete(synchronize_session=False)
+    ParkingSpot.query.filter_by(lot_id=lot_id).delete()
+        
+    db.session.delete(lot)
+    db.session.commit()
+        
+    flash('Parking lot deleted successfully', 'success')
+    return redirect(url_for('admin.admin_parking_lots'))
+        

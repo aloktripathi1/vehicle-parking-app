@@ -11,20 +11,13 @@ def edit_profile():
         return redirect(url_for('main.index'))
     
     if request.method == 'POST':
-        try:
-            current_user.name = request.form.get('name')
-            current_user.email = request.form.get('email')
-            current_user.address = request.form.get('address')
-            current_user.pincode = request.form.get('pincode')
-            db.session.commit()
-            flash('Profile updated successfully!', 'success')
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return {'success': True, 'message': 'Profile updated successfully!'}
-            return redirect(url_for('user.user_dashboard'))
-        except Exception as e:
-            db.session.rollback()
-            flash('An error occurred while updating profile', 'danger')
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return {'success': False, 'message': 'An error occurred while updating profile'}
-    
+        current_user.name = request.form.get('name')
+        current_user.email = request.form.get('email')
+        current_user.address = request.form.get('address')
+        current_user.pincode = request.form.get('pincode')
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return {'success': True, 'message': 'Profile updated successfully!'}
+        return redirect(url_for('user.user_dashboard'))
     return render_template('user/edit_profile.html', user=current_user) 

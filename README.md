@@ -5,7 +5,9 @@ This project is part of **Modern Application Development I** at IITM.
 
 ## 👥 Roles
 
-- **Admin**: Superuser who can manage parking lots, view all spots/users, and access full parking history. Admin is hardcoded and always present—no registration required.
+- **Admin**: Superuser who can manage parking lots, view all spots/users, and access full parking history. Admin is automatically created on first run—no registration required.
+  - Default credentials: `admin@parkease.com` / `admin123`
+  - Credentials can be customized via environment variables (see Configuration below)
 - **User**: Can register/login, reserve, park, and release spots.
 
 ## ⚙️ Tech Stack
@@ -13,8 +15,8 @@ This project is part of **Modern Application Development I** at IITM.
 - Flask (Python)
 - SQLite (Programmatic DB setup via SQLAlchemy)
 - Jinja2 (Templating)
-- HTML/CSS/Bootstrap (Frontend)
-- Chart.js (Summary graphs)
+- HTML/CSS (Frontend - simplified, no JavaScript dependencies)
+- Font Awesome (Icons)
 
 ## 📁 Project Structure
 
@@ -35,26 +37,30 @@ parking_app_23f3003225/
 │   ├── main/             # Main/public routes (index, login, register)
 │   └── user/             # User routes (dashboard, booking, profile)
 ├── static/               # Static assets
-│   ├── css/              # Custom and Bootstrap CSS
-│   ├── js/               # Custom JavaScript
+│   ├── css/              # Custom CSS
+│   │   └── custom.css    # Single consolidated stylesheet
 │   ├── parking_lot.jpg   # Images
 │   └── parking_lot1.jpg
 ├── templates/            # Jinja2 HTML templates
-│   ├── admin_dashboard.html
-│   ├── admin_parking_lots.html
-│   ├── admin_occupied_spots.html
-│   ├── admin_users.html
-│   ├── admin_parking_history.html
-│   ├── admin_user_reservations.html
-│   ├── user_dashboard.html
-│   ├── user_parking_lots.html
-│   ├── base.html
-│   ├── login.html
-│   ├── register.html
-│   ├── edit_profile.html
-│   ├── edit_parking_lot.html
-│   ├── index.html
-│   └── error.html
+│   ├── admin/            # Admin templates
+│   │   ├── admin_dashboard.html
+│   │   ├── admin_parking_lots.html
+│   │   ├── admin_occupied_spots.html
+│   │   ├── admin_users.html
+│   │   ├── admin_parking_history.html
+│   │   ├── admin_user_reservations.html
+│   │   └── edit_parking_lot.html
+│   ├── user/             # User templates
+│   │   ├── user_dashboard.html
+│   │   ├── user_parking_lots.html
+│   │   ├── book_spot.html
+│   │   └── edit_profile.html
+│   └── main/             # Main/public templates
+│       ├── base.html
+│       ├── index.html
+│       ├── login.html
+│       ├── register.html
+│       └── error.html
 └── ...
 ```
 
@@ -130,4 +136,28 @@ pip install -r requirements.txt
 # 3. Run the app
 python app.py
 ```
+
+The database and default admin user will be created automatically on first run.
+
+## ⚙️ Configuration
+
+### Admin Credentials
+The default admin is automatically created when the app runs for the first time. You can customize the admin credentials using environment variables:
+
+```bash
+# Set custom admin credentials (optional)
+export ADMIN_EMAIL="youradmin@example.com"
+export ADMIN_PASSWORD="yourpassword"
+export ADMIN_NAME="Your Admin Name"
+
+# Then run the app
+python app.py
+```
+
+**Default Admin Credentials** (if environment variables are not set):
+- Email: `admin@parkease.com`
+- Password: `admin123`
+- Name: `Admin User`
+
+**Note**: Admin registration is not allowed. The admin user is created programmatically only.
 
