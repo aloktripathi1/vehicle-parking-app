@@ -15,8 +15,9 @@ This project is part of **Modern Application Development I** at IITM.
 - Flask (Python)
 - SQLite (Programmatic DB setup via SQLAlchemy)
 - Jinja2 (Templating)
-- HTML/CSS (Frontend - simplified, no JavaScript dependencies)
-- Font Awesome (Icons)
+- Bootstrap 5.3 (CSS Framework)
+- Bootstrap Icons (Icons)
+- HTML/CSS (Frontend - simplified, minimal custom styling)
 
 ## 📁 Project Structure
 
@@ -37,8 +38,6 @@ parking_app_23f3003225/
 │   ├── main/             # Main/public routes (index, login, register)
 │   └── user/             # User routes (dashboard, booking, profile)
 ├── static/               # Static assets
-│   ├── css/              # Custom CSS
-│   │   └── custom.css    # Single consolidated stylesheet
 │   ├── parking_lot.jpg   # Images
 │   └── parking_lot1.jpg
 ├── templates/            # Jinja2 HTML templates

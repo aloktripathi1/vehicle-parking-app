@@ -33,7 +33,7 @@
                     <!-- Location Details -->
                     <div class="location-details mb-4">
                         <p class="mb-2">
-                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                            <i class="bi bi-pin-map-fill text-primary me-2"></i>
                             <span class="location-text">{{ lot.address }}</span>
                         </p>
                         <p class="mb-0">
@@ -46,7 +46,7 @@
                     <div class="availability-section mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-muted">
-                                <i class="fas fa-car-side me-1"></i> Available Spots
+                                <i class="bi bi-car-front-fill-side me-1"></i> Available Spots
                             </span>
                             <span class="fw-bold">{{ available_spots[lot.id] }}</span>
                         </div>
@@ -74,11 +74,11 @@
                 <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
                     {% if available_spots[lot.id] > 0 %}
                     <a href="{{ url_for('user.book_spot_page', lot_id=lot.id) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-calendar-check me-2"></i>Book a Spot
+                        <i class="bi bi-calendar-check-fill me-2"></i>Book a Spot
                     </a>
                     {% else %}
                     <button class="btn btn-secondary w-100" disabled>
-                        <i class="fas fa-times-circle me-2"></i>No Available Spots
+                        <i class="bi bi-x-lg-circle me-2"></i>No Available Spots
                     </button>
                     {% endif %}
                 </div>
