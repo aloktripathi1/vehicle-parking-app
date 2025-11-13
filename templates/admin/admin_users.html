@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users - Vehicle Parking App{% endblock %}
+
+{% block page_title %}Manage Users{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 px-md-5 py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold mb-2" style="color: var(--primary-color);">
+                <i class="fas fa-users me-2"></i>Manage Users
+            </h2>
+            <p class="text-muted">View and manage all registered users</p>
+        </div>
+    </div>
+
+    <!-- Search and Sort UI -->
+    <div class="row mb-3 search-sort-mobile-stack d-flex">
+        <div class="col-md-6 mb-2">
+            <input type="text" class="form-control w-100" id="searchInput" placeholder="Search by name or email..." style="max-width: 300px;">
+        </div>
+        <div class="col-md-6 mb-2 d-flex justify-content-end">
+            <select class="form-select w-100" id="sortSelect" style="max-width: 300px;">
+                <option value="name-asc">Name: A-Z</option>
+                <option value="name-desc">Name: Z-A</option>
+                <option value="signup-asc">Signup: Oldest First</option>
+                <option value="signup-desc">Signup: Newest First</option>
+                <option value="bookings-desc">Most Bookings</option>
+                <option value="bookings-asc">Least Bookings</option>
+                <option value="spent-desc">Highest Spent</option>
+                <option value="spent-asc">Lowest Spent</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-white rounded shadow">
+                <div class="card-header bg-white border-bottom pt-4 pb-2">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-users me-2"></i>Registered Users
+                    </h5>
+                    <div class="header-controls">
+                        <!-- Search and sort UI removed for reimplementation -->
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table admin-table" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="">ID</th>
+                                    <th class="">Name</th>
+                                    <th class="">Email</th>
+                                    <th class="">Signup Date</th>
+                                    <th class="">Total Bookings</th>
+                                    <th class="">Total Spent</th>
+                                    <th class="">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td class="">{{ user.id }}</td>
+                                    <td class="">{{ user.name }}</td>
+                                    <td class="">{{ user.email }}</td>
+                                    <td class="">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td class="">
+                                        {{ user.total_bookings }}
+                                        <a href="{{ url_for('admin.admin_user_reservation_history', user_id=user.id) }}" class="btn btn-sm btn-info btn-action ms-2" title="View Reservation History">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                    <td class="">₹{{ "%.2f"|format(user.total_spent) }}</td>
+                                    <td>
+                                        <div class="action-buttons d-flex justify-content-center align-items-center">
+                                            <button type="button" class="btn btn-sm btn-primary btn-action" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#userDetailsModal{{ user.id }}"
+                                                    title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+{% for user in users %}
+<div class="modal fade" id="userDetailsModal{{ user.id }}" tabindex="-1" aria-labelledby="userDetailsModalLabel{{ user.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="userDetailsModalLabel{{ user.id }}">
+                    <i class="fas fa-user me-2 text-primary"></i>User Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div class="user-details-flex p-3 rounded" style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                    <div class="detail-row">
+                        <i class="fas fa-user me-2"></i>
+                        <span class="label">Name:</span>
+                        <span class="value fw-semibold">{{ user.name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-envelope me-2"></i>
+                        <span class="label">Email:</span>
+                        <span class="value">{{ user.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        <span class="label">Address:</span>
+                        <span class="value">{{ user.address or 'Not provided' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-map-pin me-2"></i>
+                        <span class="label">Pincode:</span>
+                        <span class="value">{{ user.pincode or 'Not provided' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        <span class="label">Total Bookings:</span>
+                        <span class="value fw-semibold">{{ user.total_bookings }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-rupee-sign me-2"></i>
+                        <span class="label">Total Spent:</span>
+                        <span class="value fw-semibold">₹{{ "%.2f"|format(user.total_spent) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-clock me-2"></i>
+                        <span class="label">Joined Date:</span>
+                        <span class="value">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-3">
+                <a href="{{ url_for('admin.admin_user_reservation_history', user_id=user.id) }}" class="btn btn-info">
+                    <i class="fas fa-history me-2"></i>View Bookings
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

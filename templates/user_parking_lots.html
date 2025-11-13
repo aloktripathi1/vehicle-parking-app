@@ -9,10 +9,10 @@
     <!-- Header Section -->
     <div class="row mb-3">
         <div class="col-12">
-            <h2 class="fw-bold mb-2 dark-mode-text parking-lots-heading">
+            <h2 class="fw-bold mb-2 parking-lots-heading">
                 <i class="fas fa-building me-2"></i>Available Parking Lots
             </h2>
-            <p class="text-muted dark-mode-text parking-lots-subtext">Find and book a parking spot instantly at your preferred location.</p>
+            <p class="text-muted parking-lots-subtext">Find and book a parking spot instantly at your preferred location.</p>
         </div>
     </div>
 
@@ -20,10 +20,10 @@
     <div class="row g-4" id="parkingLotsContainer">
         {% for lot in parking_lots %}
         <div class="col-12 col-md-6 col-lg-4 parking-lot-card">
-            <div class="card bg-white dark-mode-card rounded shadow h-100">
-                <div class="card-header bg-white dark-mode-card border-bottom pt-4 pb-2">
+            <div class="card bg-white rounded shadow h-100">
+                <div class="card-header bg-white border-bottom pt-4 pb-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-primary dark-mode-text parking-lot-name">
+                        <h5 class="mb-0 text-primary parking-lot-name">
                             <i class="fas fa-building me-2"></i>{{ lot.prime_location_name }}
                     </h5>
                         <span class="badge bg-primary price-badge">₹{{ lot.price }}/hr</span>
@@ -32,11 +32,11 @@
                 <div class="card-body">
                     <!-- Location Details -->
                     <div class="location-details mb-4">
-                        <p class="mb-2 dark-mode-text">
+                        <p class="mb-2">
                             <i class="fas fa-map-marker-alt text-primary me-2"></i>
                             <span class="location-text">{{ lot.address }}</span>
                         </p>
-                        <p class="mb-0 dark-mode-text">
+                        <p class="mb-0">
                             <i class="fas fa-map-pin text-primary me-2"></i>
                             <span class="pincode-text">{{ lot.pincode }}</span>
                         </p>
@@ -45,10 +45,10 @@
                     <!-- Availability Bar -->
                     <div class="availability-section mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted dark-mode-text">
+                            <span class="text-muted">
                                 <i class="fas fa-car-side me-1"></i> Available Spots
                             </span>
-                            <span class="fw-bold dark-mode-text">{{ available_spots[lot.id] }}</span>
+                            <span class="fw-bold">{{ available_spots[lot.id] }}</span>
                         </div>
                         <div class="availability-bar">
                             <div class="progress" style="height: 8px;">
@@ -73,18 +73,9 @@
                 </div>
                 <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
                     {% if available_spots[lot.id] > 0 %}
-                    <button type="button" class="btn btn-primary w-100 lot-book-btn" 
-                        data-lot-id="{{ lot.id }}" 
-                        data-lot-name="{{ lot.prime_location_name }}"
-                        data-address="{{ lot.address }}"
-                        data-pincode="{{ lot.pincode }}"
-                        data-price="{{ lot.price }}"
-                        data-available-spots="{{ available_spots[lot.id] }}"
-                        data-spot-ids="{{ available_spot_ids[lot.id]|join(',') }}"
-                        data-user-address="{{ current_user.address|default('') }}"
-                        data-user-pincode="{{ current_user.pincode|default('') }}">
+                    <a href="{{ url_for('user.book_spot_page', lot_id=lot.id) }}" class="btn btn-primary w-100">
                         <i class="fas fa-calendar-check me-2"></i>Book a Spot
-                    </button>
+                    </a>
                     {% else %}
                     <button class="btn btn-secondary w-100" disabled>
                         <i class="fas fa-times-circle me-2"></i>No Available Spots
@@ -96,405 +87,4 @@
         {% endfor %}
     </div>
 </div>
-
-<!-- Booking Modal -->
-<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="bookingForm" method="POST" action="/user/book_spot">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="bookModalLabel">
-                        <i class="fas fa-calendar-check me-2 text-primary"></i>Book Parking Spot
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body pt-3">
-                    <!-- Parking Lot Details -->
-                    <div class="booking-details mb-4">
-                        <div class="d-flex align-items-start mb-3">
-                            <i class="fas fa-map-marker-alt text-primary me-2 mt-1"></i>
-                            <div>
-                                <span id="modalLotName" class="fw-semibold d-block mb-1"></span>
-                                <span id="modalAddress" class="text-muted d-block"></span>
-                                <span id="modalPincode" class="text-muted"></span>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-tag text-primary me-2"></i>
-                            <span id="modalPrice" class="fw-semibold"></span>
-                            <span class="text-muted ms-1">/hour</span>
-                        </div>
-                    </div>
-
-                    <!-- Vehicle Number Input -->
-                    <div class="booking-form">
-                        <input type="hidden" id="modalLotId" name="lot_id">
-                        <input type="hidden" id="modalSpotId" name="spot_id">
-                        <div class="mb-3">
-                            <label for="modalVehicleNumber" class="form-label">Vehicle Number <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="modalVehicleNumber" name="vehicle_number" required
-                                   placeholder="Enter your vehicle number">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-check-circle me-2"></i>Confirm Booking
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Profile Completion Modal -->
-<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="profileModalLabel">
-                    <i class="fas fa-user-edit me-2 text-primary"></i>Complete Your Profile
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-3">
-                <p>Please complete your profile by adding your address and pin code before booking a spot.</p>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal" data-bs-dismiss="modal">Update Profile</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Active Booking Modal -->
-<div class="modal fade" id="activeBookingModal" tabindex="-1" aria-labelledby="activeBookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="activeBookingModalLabel">
-                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Active Booking Exists
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-3">
-                <p class="mb-0">You already have an active booking. Please cancel your current booking before making a new one.</p>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                <a href="{{ url_for('user.user_dashboard') }}" class="btn btn-warning">
-                    <i class="fas fa-times-circle me-2"></i>Cancel Current Booking
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-/* Base Styles */
-:root {
-    --primary-color: #006064;
-    --primary-hover: #00838f;
-    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --card-hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-    --border-radius: 12px;
-    --transition-speed: 0.3s;
-    --light-text: #000000;
-    --light-bg: #ffffff;
-    --dark-text: #ffffff;
-    --dark-bg: #000000;
-}
-
-/* Dark Mode Background Colors */
-body[data-theme="dark"] {
-    background-color: var(--dark-bg) !important;
-    color: var(--dark-text) !important;
-}
-
-body[data-theme="dark"] .card {
-    background-color: #000000 !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-}
-
-body[data-theme="dark"] .card-header {
-    background-color: #000000 !important;
-    color: #ffffff !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-}
-
-body[data-theme="dark"] .card-body {
-    color: #ffffff !important;
-}
-
-body[data-theme="dark"] .dark-mode-text {
-    color: #ffffff !important;
-}
-
-body[data-theme="dark"] .text-muted {
-    color: rgba(255, 255, 255, 0.7) !important;
-}
-
-body[data-theme="dark"] .modal-content {
-    background-color: #000000 !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-body[data-theme="dark"] .modal-header,
-body[data-theme="dark"] .modal-footer {
-    border-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-/* Header Styles */
-.parking-lots-heading {
-    font-size: 2rem !important;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-}
-
-.parking-lots-subtext {
-    font-size: 1rem;
-    color: var(--light-text);
-}
-
-body[data-theme="dark"] .parking-lots-subtext {
-    color: #ffffff !important;
-    opacity: 0.9;
-}
-
-/* Search and Filter Card */
-.card {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    transition: all var(--transition-speed) ease;
-    background-color: var(--light-bg);
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--card-hover-shadow);
-}
-
-.input-group {
-    border: 1px solid #dee2e6;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    transition: all var(--transition-speed) ease;
-    height: 40px;
-}
-
-.input-group:focus-within {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0, 96, 100, 0.15);
-}
-
-.input-group .input-group-text {
-    background-color: transparent;
-    border: none;
-    padding: 0.5rem 1rem;
-}
-
-.input-group .form-control {
-    border: none;
-    padding: 0.5rem 1rem;
-    height: 100%;
-}
-
-.form-select {
-    height: 40px;
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    border: 1px solid #dee2e6;
-    transition: all var(--transition-speed) ease;
-}
-
-.form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0, 96, 100, 0.15);
-}
-
-/* Dark Mode Input Styles */
-body[data-theme="dark"] .input-group {
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-body[data-theme="dark"] .input-group-text {
-    color: var(--dark-text);
-}
-
-body[data-theme="dark"] .form-control,
-body[data-theme="dark"] .form-select {
-    background-color: var(--dark-bg);
-    color: var(--dark-text);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-body[data-theme="dark"] .form-control:focus,
-body[data-theme="dark"] .form-select:focus {
-    background-color: var(--dark-bg);
-    color: var(--dark-text);
-    border-color: var(--primary-color);
-}
-
-body[data-theme="dark"] .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-body[data-theme="dark"] .form-select option {
-    background-color: #1f2937;
-    color: #ffffff;
-}
-
-/* Parking Lot Cards */
-.parking-lot-card .card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 2px solid rgba(0, 0, 0, 0.05);
-    background-color: var(--card-bg);
-}
-
-.parking-lot-card .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-.parking-lot-card .card-header {
-    background-color: var(--card-bg);
-    border-bottom: 1px solid var(--border-color);
-    padding: 1rem;
-}
-
-.parking-lot-card .card-body {
-    padding: 1rem;
-}
-
-.parking-lot-card .card-footer {
-    background-color: var(--card-bg);
-    border-top: 1px solid var(--border-color);
-    padding: 1rem;
-}
-
-.parking-lot-card .location-details p {
-    margin-bottom: 0.5rem;
-    color: var(--text-color);
-    font-size: 0.95rem;
-}
-
-.parking-lot-card .badge {
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-}
-
-.parking-lot-card .availability-section {
-    color: var(--text-color);
-}
-
-.parking-lot-card .progress {
-    height: 8px;
-    border-radius: 4px;
-    background-color: #e9ecef;
-}
-
-.parking-lot-card .lot-book-btn {
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
-    border-radius: var(--border-radius);
-    transition: all var(--transition-speed) ease;
-}
-
-.parking-lot-card .lot-book-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Theme-specific styles */
-[data-theme="light"] {
-    --card-bg: #ffffff;
-    --border-color: #e5e7eb;
-    --text-color: #1f2937;
-}
-
-[data-theme="dark"] {
-    --card-bg: #000000;
-    --border-color: rgba(255, 255, 255, 0.15);
-    --text-color: #ffffff;
-}
-
-[data-theme="light"] .parking-lot-card .card {
-    background-color: #ffffff;
-}
-
-[data-theme="dark"] .parking-lot-card .card {
-    background-color: #000000;
-}
-
-[data-theme="light"] .parking-lot-card .location-details p,
-[data-theme="light"] .parking-lot-card .availability-section {
-    color: #1f2937;
-}
-
-[data-theme="dark"] .parking-lot-card .location-details p,
-[data-theme="dark"] .parking-lot-card .availability-section {
-    color: #ffffff;
-}
-
-/* Search and Sort Container */
-.search-sort-container {
-    transition: all 0.3s ease;
-}
-
-.search-sort-container:hover {
-    border-color: rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="dark"] .search-sort-container:hover {
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.booking-details {
-    background-color: var(--card-bg);
-    padding: 1.25rem;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-}
-
-.booking-details .d-flex {
-    padding: 0.5rem 0;
-}
-
-.booking-details .d-flex:not(:last-child) {
-    border-bottom: 1px solid var(--border-color);
-}
-
-.booking-details i {
-    font-size: 1.1rem;
-    width: 24px;
-    text-align: center;
-}
-
-.booking-details small {
-    font-size: 0.85rem;
-}
-
-/* Dark mode adjustments */
-body[data-theme="dark"] .booking-details {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
-}
-
-body[data-theme="dark"] .booking-details .d-flex:not(:last-child) {
-    border-bottom-color: var(--border-color);
-}
-
-body[data-theme="dark"] .booking-details .text-muted {
-    color: var(--text-muted) !important;
-}
-</style>
-
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/parking_lots.js') }}"></script>
 {% endblock %}

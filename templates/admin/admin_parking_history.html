@@ -3,23 +3,14 @@
 
 {% block page_title %}Parking History{% endblock %}
 {% block content %}
-<style>
-body[data-theme="dark"] .parking-history-subtext {
-  color: #fff !important;
-}
-body[data-theme="dark"] .btn-primary, body[data-theme="dark"] .form-select {
-  background-color: #000 !important;
-  color: #fff !important;
-  border-color: #2d3748 !important;
-}
-</style>
+
 <div class="container-fluid px-4 px-md-5 py-4">
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="fw-bold mb-2" style="color: var(--primary-color);">
                 <i class="fas fa-history me-2"></i>Parking History
             </h2>
-            <p class="text-muted dark-mode-text parking-history-subtext">Complete log of all reservations ever made.</p>
+            <p class="text-muted parking-history-subtext">Complete log of all reservations ever made.</p>
         </div>
     </div>
     <!-- Filters -->
@@ -59,7 +50,7 @@ body[data-theme="dark"] .btn-primary, body[data-theme="dark"] .form-select {
         </div>
     </form>
     <!-- Table -->
-    <div class="card bg-white dark-mode-card rounded shadow">
+    <div class="card bg-white rounded shadow">
         <div class="card-body p-4">
             <div class="table-responsive">
                 <table class="table admin-table" id="historyTable" width="100%" cellspacing="0">

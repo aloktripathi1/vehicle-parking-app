@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Occupied Spots - Vehicle Parking App{% endblock %}
+
+{% block page_title %}Occupied Spots{% endblock %}
+
+{% block head %}
+
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 px-md-5 py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold mb-2" style="color: var(--primary-color);">
+                <i class="fas fa-car me-2"></i>Occupied Parking Spots
+            </h2>
+            <p class="text-muted">View all currently occupied parking spots and their details.</p>
+        </div>
+    </div>
+
+    <!-- Occupied Spots Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-white rounded shadow">
+                <div class="card-header bg-white border-bottom">
+                    <div class="card-header-left">
+                        <h5 class="mb-0 text-primary">
+                            🅿️ Currently Occupied Spots
+                        </h5>
+                    </div>
+                    <div class="card-header-right">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="searchInput" class="search-input" placeholder="Search by Spot ID, User Name, or Vehicle Number">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table admin-table" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="">Parking Lot</th>
+                                    <th class="">Spot ID</th>
+                                    <th class="">User</th>
+                                    <th class="">Vehicle Number</th>
+                                    <th class="">Parked Since</th>
+                                    <th class="">Duration</th>
+                                    <th class="">Current Cost</th>
+                                    <th class="">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for spot, lot, reservation, user in occupied_spots %}
+                                <tr>
+                                    <td class="">{{ lot.prime_location_name }}</td>
+                                    <td class="">{{ spot.id }}</td>
+                                    <td class="">{{ user.name }}{% if user.username %} {{ user.username }}{% endif %}</td>
+                                    <td class="">{{ reservation.vehicle_number if reservation.vehicle_number else 'N/A' }}</td>
+                                    <td class="">{{ format_ist_datetime(reservation.parking_timestamp) }}</td>
+                                    <td class="">
+                                        {% set duration = (now - reservation.parking_timestamp).total_seconds() // 60 %}
+                                        {% if duration < 60 %}
+                                            {{ duration|int }} minutes
+                                        {% else %}
+                                            {{ (duration // 60)|int }} hours, {{ (duration % 60)|int }} minutes
+                                        {% endif %}
+                                    </td>
+                                    <td class="">
+                                        {% set hours = (now - reservation.parking_timestamp).total_seconds() / 3600 %}
+                                        ₹{{ "%.2f"|format(hours * lot.price) }}
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button type="button" class="btn btn-sm btn-danger btn-action" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#endReservationModal{{ spot.id }}"
+                                                    title="End Reservation">
+                                                <i class="fas fa-stop-circle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Reservation Modals -->
+{% for spot, lot, reservation, user in occupied_spots %}
+<div class="modal fade" id="endReservationModal{{ spot.id }}" tabindex="-1" aria-labelledby="endReservationModalLabel{{ spot.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="endReservationModalLabel{{ spot.id }}">
+                    <i class="fas fa-stop-circle me-2 text-danger"></i>End Reservation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p class="mb-3">Are you sure you want to end this reservation? This action cannot be undone.</p>
+                <div class="reservation-details">
+                    <div class="detail-item">
+                        <label>Spot ID:</label>
+                        <span>{{ spot.id }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>User:</label>
+                        <span>{{ user.name }} ({{ user.username }})</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Vehicle:</label>
+                        <span>{{ reservation.vehicle_number }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Parked Since:</label>
+                        <span>{{ format_ist_datetime(reservation.parking_timestamp) }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Location:</label>
+                        <span>{{ lot.prime_location_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Rate:</label>
+                        <span>₹{{ lot.price }}/hr</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('admin.end_reservation', spot_id=spot.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check-circle me-2"></i>End Reservation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

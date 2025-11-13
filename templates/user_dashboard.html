@@ -12,7 +12,7 @@
             <h2 class="fw-bold" style="color: var(--primary-color);">
                 <i class="fas fa-user-circle me-2"></i>Welcome, {{ current_user.name }}
             </h2>
-            <p class="text-muted dark-mode-text">Here's your parking activity overview</p>
+            <p class="text-muted">Here's your parking activity overview</p>
         </div>
     </div>
 
@@ -20,29 +20,29 @@
     {% if active_reservation and active_reservation[0] %}
     <div class="row mb-4">
         <div class="col-md-12">
-            <div class="card bg-white dark-mode-card rounded shadow">
-                <div class="card-header bg-white dark-mode-card border-bottom">
-                    <h5 class="mb-0 text-primary dark-mode-text">
+            <div class="card bg-white rounded shadow">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 text-primary">
                         <i class="bi bi-info-circle me-2"></i>Active Parking Reservation
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <p class="mb-3 dark-mode-text">Your vehicle is currently parked at <strong>{{ active_reservation[2].prime_location_name }}</strong>.</p>
-                    <hr class="dark-mode-border">
+                    <p class="mb-3">Your vehicle is currently parked at <strong>{{ active_reservation[2].prime_location_name }}</strong>.</p>
+                    <hr class="">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="d-flex flex-column gap-2">
                                 <div class="d-flex align-items-center">
-                                    <i class="bi bi-clock me-2 dark-mode-text"></i>
-                                    <span class="dark-mode-text"><strong>Parked since:</strong> {{ format_ist_datetime(active_reservation[0].parking_timestamp) }}</span>
+                                    <i class="bi bi-clock me-2"></i>
+                                    <span class=""><strong>Parked since:</strong> {{ format_ist_datetime(active_reservation[0].parking_timestamp) }}</span>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <i class="bi bi-hash me-2 dark-mode-text"></i>
-                                    <span class="dark-mode-text"><strong>Spot ID:</strong> {{ active_reservation[1].id }}</span>
+                                    <i class="bi bi-hash me-2"></i>
+                                    <span class=""><strong>Spot ID:</strong> {{ active_reservation[1].id }}</span>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <i class="bi bi-tag me-2 dark-mode-text"></i>
-                                    <span class="dark-mode-text"><strong>Price per hour:</strong> ₹{{ active_reservation[2].price }}</span>
+                                    <i class="bi bi-tag me-2"></i>
+                                    <span class=""><strong>Price per hour:</strong> ₹{{ active_reservation[2].price }}</span>
                                 </div>
                             </div>
                         </div>
@@ -59,15 +59,15 @@
     {% else %}
     <div class="row mb-4">
         <div class="col-md-12">
-            <div class="card bg-white dark-mode-card rounded shadow">
-                <div class="card-header bg-white dark-mode-card border-bottom">
-                    <h5 class="mb-0 text-primary dark-mode-text">
+            <div class="card bg-white rounded shadow">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 text-primary">
                         <i class="fas fa-parking me-2"></i>No Active Reservation
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <p class="mb-3 dark-mode-text">You don't have any active parking reservation. Would you like to book a parking spot?</p>
-                    <hr class="dark-mode-border">
+                    <p class="mb-3">You don't have any active parking reservation. Would you like to book a parking spot?</p>
+                    <hr class="">
                     <a href="{{ url_for('user.user_parking_lots') }}" class="btn btn-primary btn-lg px-4">
                         <i class="fas fa-plus-circle me-2"></i>Book a Parking Spot
                     </a>
@@ -81,8 +81,8 @@
     <div class="row mb-4">
         <div class="col-12 col-lg-8 mb-4">
             <div class="card dashboard-card recent-costs-card">
-                <div class="card-header bg-white dark-mode-card border-bottom">
-                    <h5 class="mb-0 dark-mode-text">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">
                         <i class="fas fa-chart-line me-2"></i>Recent Parking Costs
                     </h5>
                 </div>
@@ -95,8 +95,8 @@
         </div>
         <div class="col-12 col-lg-4 mb-4">
             <div class="card dashboard-card parking-summary-card">
-                <div class="card-header bg-white dark-mode-card border-bottom">
-                    <h5 class="mb-0 dark-mode-text">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">
                         <i class="fas fa-car me-2"></i>Parking Summary
                     </h5>
                 </div>
@@ -150,9 +150,9 @@
     <!-- Reservation History Section -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <div class="card bg-white dark-mode-card rounded shadow">
-                <div class="card-header bg-white dark-mode-card border-bottom">
-                    <h5 class="mb-0 text-primary dark-mode-text">
+            <div class="card bg-white rounded shadow">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 text-primary">
                         <i class="fas fa-history me-2"></i>Reservation History
                     </h5>
                 </div>
@@ -216,15 +216,15 @@
                 <div class="booking-details mb-4">
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-clock text-primary me-2"></i>
-                        <span class="dark-mode-text">Parking Duration: <span id="parkingDuration" class="fw-bold"></span></span>
+                        <span class="">Parking Duration: <span id="parkingDuration" class="fw-bold"></span></span>
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-tag text-primary me-2"></i>
-                        <span class="dark-mode-text">Price per hour: <span class="fw-bold">₹{{ active_reservation[2].price }}</span></span>
+                        <span class="">Price per hour: <span class="fw-bold">₹{{ active_reservation[2].price }}</span></span>
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-calculator text-primary me-2"></i>
-                        <span class="dark-mode-text">Total Amount: <span id="totalAmount" class="fw-bold"></span></span>
+                        <span class="">Total Amount: <span id="totalAmount" class="fw-bold"></span></span>
                     </div>
                 </div>
 
@@ -234,19 +234,19 @@
                     <div class="d-flex flex-column gap-2">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="UPI" checked>
-                            <label class="form-check-label dark-mode-text" for="upi">
+                            <label class="form-check-label" for="upi">
                                 <i class="fas fa-mobile-alt me-2"></i>UPI
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="card" value="Card">
-                            <label class="form-check-label dark-mode-text" for="card">
+                            <label class="form-check-label" for="card">
                                 <i class="fas fa-credit-card me-2"></i>Card
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="Wallet">
-                            <label class="form-check-label dark-mode-text" for="wallet">
+                            <label class="form-check-label" for="wallet">
                                 <i class="fas fa-wallet me-2"></i>Wallet
                             </label>
                         </div>
@@ -358,271 +358,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- ... existing modal content ... -->
 </div>
 
-<style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    }
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    }
-    .table th {
-        font-weight: 600;
-        color: var(--primary-color);
-    }
-    .table td {
-        vertical-align: middle;
-    }
-    .alert {
-        border-radius: var(--border-radius);
-    }
-    
-    /* Card Styles */
-    .card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        background-color: #ffffff !important;
-    }
-    
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-    
-    .card-header {
-        padding: 1rem 1.5rem;
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    
-    .card-header h5 {
-        font-weight: 600;
-        color: #000000 !important;
-    }
-    
-    .card-body {
-        color: #000000 !important;
-    }
-    
-    .dark-mode-text {
-        color: #000000 !important;
-    }
-    
-    /* Dark mode styles */
-    body[data-theme="dark"] .card {
-        background-color: #000000 !important;
-    }
-    
-    body[data-theme="dark"] .card-header {
-        background-color: #000000 !important;
-        color: #ffffff !important;
-    }
-    
-    body[data-theme="dark"] .card-header h5 {
-        color: #ffffff !important;
-        }
-    
-    body[data-theme="dark"] .card-body {
-        color: #ffffff !important;
-    }
-    
-    body[data-theme="dark"] .dark-mode-text {
-        color: #ffffff !important;
-    }
-    
-    body[data-theme="dark"] .text-muted {
-        color: rgba(255, 255, 255, 0.7) !important;
-    }
-    
-    /* Table styles */
-    .table {
-        color: #000000 !important;
-    }
-    
-    body[data-theme="dark"] .table {
-        color: #ffffff !important;
-    }
-    
-    body[data-theme="dark"] .table thead th {
-        background-color: #000000 !important;
-        border-bottom-color: #2d3748 !important;
-    }
-    
-    body[data-theme="dark"] .table td {
-        border-color: #2d3748 !important;
-    }
-    
-    /* Remove unnecessary section */
-    .search-filter-container,
-    #parkingLotsContainer {
-        display: none !important;
-    }
-
-    /* Parking Summary Card Height Matching */
-    .parking-summary-card {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .parking-summary-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-height: 400px; /* Adjust this value to match the chart card height */
-    }
-
-    /* Parking Summary Card Styles - Fixed Shadow Issue */
-    .icon-circle {
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-    }
-
-    .icon-circle i {
-        transition: all 0.3s ease;
-        color: #ffffff !important;
-    }
-
-    /* Remove problematic shadow filters that cause color issues in dark mode */
-    [data-theme="light"] .icon-circle i {
-        filter: none; /* Removed drop-shadow */
-    }
-
-    [data-theme="dark"] .icon-circle {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    [data-theme="dark"] .icon-circle i {
-        color: #ffffff !important;
-        filter: none; /* Removed drop-shadow that was causing color issues */
-    }
-
-    /* Hover Effects */
-    .card:hover .icon-circle {
-        transform: scale(1.05);
-    }
-
-    .card:hover .icon-circle i {
-        transform: scale(1.1);
-    }
-
-    /* Card Background Gradients */
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #00838f 100%);
-    }
-
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
-    }
-
-    .bg-gradient-warning {
-        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-    }
-
-    /* Chart container to ensure proper height */
-    .chart-container {
-        height: 400px;
-        position: relative;
-    }
-</style>
-
 {% endblock %}
 
 {% block scripts %}
-<script>
-    // Parse chart data from server
-    const chartData = {{ chart_data|safe }};
-    
-    // Function to check dark mode
-    function isDarkMode() {
-        return document.body.getAttribute('data-theme') === 'dark';
-    }
-    
-    // Bar Chart for Recent Costs
-    const ctxBar = document.getElementById('costBarChart').getContext('2d');
-    const costBarChart = new Chart(ctxBar, {
-        type: 'bar',
-        data: {
-            labels: chartData.labels,
-            datasets: [{
-                label: 'Parking Cost (₹)',
-                data: chartData.costs,
-                backgroundColor: 'rgba(78, 115, 223, 0.8)',
-                hoverBackgroundColor: 'rgba(46, 89, 217, 0.9)',
-                borderColor: 'rgba(78, 115, 223, 1)',
-                borderWidth: 1,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    backgroundColor: isDarkMode() ? '#000000' : 'rgb(255,255,255)',
-                    borderColor: isDarkMode() ? '#2d3748' : '#dddfeb',
-                    borderWidth: 1,
-                    titleColor: isDarkMode() ? '#ffffff' : '#000000',
-                    bodyColor: isDarkMode() ? '#ffffff' : '#000000',
-                    callbacks: {
-                        label: function(context) {
-                            return `₹${context.raw}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        color: isDarkMode() ? '#2d3748' : '#e3e6f0'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: isDarkMode() ? '#2d3748' : '#e3e6f0'
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return '₹' + value;
-                        }
-                    }
-                }
-            }
-        }
-    });
 
-    // Update chart colors when theme changes
-    document.addEventListener('themeChanged', function() {
-        costBarChart.options.scales.x.grid.color = isDarkMode() ? '#2d3748' : '#e3e6f0';
-        costBarChart.options.scales.y.grid.color = isDarkMode() ? '#2d3748' : '#e3e6f0';
-        costBarChart.options.plugins.tooltip.backgroundColor = isDarkMode() ? '#000000' : 'rgb(255,255,255)';
-        costBarChart.options.plugins.tooltip.borderColor = isDarkMode() ? '#2d3748' : '#dddfeb';
-        costBarChart.update();
-    });
-
-    // Initialize DataTable
-    $(document).ready(function() {
-        $('#dataTable').DataTable({
-            "order": [[ 0, "desc" ]], // Default sort by ID descending
-            "pageLength": 5, // Show 5 entries per page
-            "lengthMenu": [ [5, 10, 25, -1], [5, 10, 25, "All"] ],
-            responsive: true,
-            language: {
-                search: "_INPUT_",
-                searchPlaceholder: "Search records..."
-            }
-        });
-    });
-</script>
 {% endblock %}
