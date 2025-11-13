@@ -10,17 +10,15 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate():
-            admin = Admin.query.filter_by(email=form.email.data).first()
-            if admin and check_password_hash(admin.password_hash, form.password.data):
-                login_user(admin)
-                session['user_type'] = 'admin'
-                return redirect(url_for('admin.admin_dashboard'))
-            
             user = User.query.filter_by(email=form.email.data).first()
             if user and check_password_hash(user.password_hash, form.password.data):
                 login_user(user)
-                session['user_type'] = 'user'
-                return redirect(url_for('user.user_dashboard'))
+                if user.role == 'admin':
+                    session['user_type'] = 'admin'
+                    return redirect(url_for('admin.admin_dashboard'))
+                else:
+                    session['user_type'] = 'user'
+                    return redirect(url_for('user.user_dashboard'))
             
             flash('Invalid email or password', 'danger')
         else:

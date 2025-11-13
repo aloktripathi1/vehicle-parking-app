@@ -44,7 +44,6 @@ app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(user_bp, url_prefix='/user')
 
 def create_default_admin():
-    """Create default admin user if not exists"""
     admin_email = os.environ.get('ADMIN_EMAIL', 'admin@parkease.com')
     admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
     admin_name = os.environ.get('ADMIN_NAME', 'Admin User')
@@ -87,6 +86,7 @@ def has_active_booking(user_id):
         Reservation.status.in_(active_statuses)
     ).first()
     return active_booking is not None
+
 def verify_spot_statuses(lot_id):
     spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
         
@@ -107,6 +107,6 @@ def verify_spot_statuses(lot_id):
         
     db.session.commit()
     return True
+
 if __name__ == '__main__':
     app.run(debug=True)
-    

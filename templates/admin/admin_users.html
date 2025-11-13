@@ -129,7 +129,7 @@
                         <span class="value">{{ user.address or 'Not provided' }}</span>
                     </div>
                     <div class="detail-row">
-                        <i class="fas fa-map-pin me-2"></i>
+                        <i class="bi bi-geo-alt-fill me-2"></i>
                         <span class="label">Pincode:</span>
                         <span class="value">{{ user.pincode or 'Not provided' }}</span>
                     </div>
@@ -139,7 +139,7 @@
                         <span class="value fw-semibold">{{ user.total_bookings }}</span>
                     </div>
                     <div class="detail-row">
-                        <i class="fas fa-rupee-sign me-2"></i>
+                        <i class="bi bi-currency-rupee me-2"></i>
                         <span class="label">Total Spent:</span>
                         <span class="value fw-semibold">₹{{ "%.2f"|format(user.total_spent) }}</span>
                     </div>

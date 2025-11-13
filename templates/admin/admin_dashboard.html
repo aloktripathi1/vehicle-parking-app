@@ -32,15 +32,15 @@
             <div class="card dashboard-card">
                 <div class="card-body p-3 position-relative">
                     <div class="dashboard-icon-circle bg-success bg-opacity-10">
-                        <i class="fas fa-money-bill-wave text-success"></i>
+                        <i class="bi bi-cash-stack text-success"></i>
                     </div>
                     <h6 class="text-muted mb-2">Total Revenue</h6>
                     <h2 class="mb-2">₹{{ '%.2f' % total_revenue }}</h2>
                     <div class="daily-change {% if revenue_change >= 0 %}text-success{% else %}text-danger{% endif %}">
                         {% if revenue_change >= 0 %}
-                            <i class="fas fa-arrow-up"></i>
+                            <i class="bi bi-arrow-up"></i>
                         {% else %}
-                            <i class="fas fa-arrow-down"></i>
+                            <i class="bi bi-arrow-down"></i>
                         {% endif %}
                         ₹{{ '%.2f' % revenue_change|abs }} today
                         <span class="change-percent">({{ '%.1f' % revenue_change_percent|abs }}%)</span>
@@ -62,7 +62,7 @@
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
                     <a href="{{ url_for('admin.admin_parking_lots') }}" class="text-primary text-decoration-none small">
-                        View Details <i class="fas fa-arrow-right ms-2"></i>
+                        View Details <i class="bi bi-arrow-right ms-2"></i>
                     </a>
                 </div>
             </div>
@@ -77,16 +77,16 @@
                     <h2 class="mb-2">{{ available_spots }}</h2>
                     <div class="daily-change {% if spot_change >= 0 %}text-success{% else %}text-warning{% endif %}">
                         {% if spot_change >= 0 %}
-                            <i class="fas fa-arrow-up"></i>
+                            <i class="bi bi-arrow-up"></i>
                         {% else %}
-                            <i class="fas fa-arrow-down"></i>
+                            <i class="bi bi-arrow-down"></i>
                         {% endif %}
                         {{ spot_change|abs }} spots today
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
                     <a href="{{ url_for('admin.admin_parking_lots') }}" class="text-success text-decoration-none small">
-                        View Details <i class="fas fa-arrow-right ms-2"></i>
+                        View Details <i class="bi bi-arrow-right ms-2"></i>
                     </a>
                 </div>
             </div>
@@ -101,16 +101,16 @@
                     <h2 class="mb-2">{{ occupied_spots }}</h2>
                     <div class="daily-change {% if spot_change <= 0 %}text-success{% else %}text-warning{% endif %}">
                         {% if spot_change <= 0 %}
-                            <i class="fas fa-arrow-down"></i>
+                            <i class="bi bi-arrow-down"></i>
                         {% else %}
-                            <i class="fas fa-arrow-up"></i>
+                            <i class="bi bi-arrow-up"></i>
                         {% endif %}
                         {{ spot_change|abs }} spots today
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
                     <a href="{{ url_for('admin.occupied_spots') }}" class="text-warning text-decoration-none small">
-                        View Details <i class="fas fa-arrow-right ms-2"></i>
+                        View Details <i class="bi bi-arrow-right ms-2"></i>
                     </a>
                 </div>
             </div>
@@ -125,9 +125,9 @@
                     <h2 class="mb-2">{{ users }}</h2>
                     <div class="daily-change {% if user_change >= 0 %}text-success{% else %}text-danger{% endif %}">
                         {% if user_change >= 0 %}
-                            <i class="fas fa-arrow-up"></i>
+                            <i class="bi bi-arrow-up"></i>
                         {% else %}
-                            <i class="fas fa-arrow-down"></i>
+                            <i class="bi bi-arrow-down"></i>
                         {% endif %}
                         {{ user_change|abs }} users today
                         <span class="change-percent">({{ '%.1f' % user_change_percent|abs }}%)</span>
@@ -135,7 +135,7 @@
                 </div>
                 <div class="card-footer bg-transparent border-0 p-3 pt-0">
                     <a href="{{ url_for('admin.admin_users') }}" class="text-info text-decoration-none small">
-                        View Details <i class="fas fa-arrow-right ms-2"></i>
+                        View Details <i class="bi bi-arrow-right ms-2"></i>
                     </a>
                 </div>
             </div>

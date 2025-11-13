@@ -19,7 +19,7 @@
                     <div class="mb-4">
                         <h6 class="fw-bold mb-3">Parking Lot Details</h6>
                         <div class="mb-2">
-                            <i class="fas fa-building text-primary me-2"></i>
+                            <i class="bi bi-building text-primary me-2"></i>
                             <strong>{{ lot.prime_location_name }}</strong>
                         </div>
                         <div class="mb-2">
@@ -27,11 +27,11 @@
                             {{ lot.address }}
                         </div>
                         <div class="mb-2">
-                            <i class="fas fa-map-pin text-primary me-2"></i>
+                            <i class="bi bi-geo-alt-fill text-primary me-2"></i>
                             Pincode: {{ lot.pincode }}
                         </div>
                         <div class="mb-2">
-                            <i class="fas fa-tag text-primary me-2"></i>
+                            <i class="bi bi-tag-fill text-primary me-2"></i>
                             <strong>₹{{ lot.price }}/hour</strong>
                         </div>
                         <div>
@@ -59,7 +59,7 @@
 
                         <div class="d-flex gap-3">
                             <a href="{{ url_for('user.parking_lots') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Back
+                                <i class="bi bi-arrow-left me-2"></i>Back
                             </a>
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-circle-fill me-2"></i>Confirm Booking
