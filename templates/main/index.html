@@ -1,0 +1,1030 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - ParkEase{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" aria-label="Main hero section">
+    <div class="container position-relative">
+        <div class="hero-content">
+            <div class="hero-text text-center">
+                <h1 class="display-4 fw-bold mb-4 animate-fade-in">
+                    Park Smarter. <span class="text-gradient fw-normal">Anywhere, Anytime.</span>
+                </h1>
+                <p class="lead mb-5 animate-fade-in-delay">
+                    Find and reserve parking instantly. Skip the search, park smarter.
+                </p>
+                <div class="d-flex justify-content-center mb-5 animate-fade-in-delay-2">
+                    <a href="{{ url_for('main.register') }}" class="btn btn-primary btn-lg" role="button" aria-label="Get started with ParkEase">
+                        <i class="fas fa-rocket me-2"></i>Get Started
+                    </a>
+                </div>
+                <div class="stats-container animate-fade-in-delay-3">
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Parking Spots</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">20+</div>
+                            <div class="stat-label">Locations</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">10K+</div>
+                            <div class="stat-label">Happy Users</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-cue animate-bounce">
+                <a href="#features" class="text-white" aria-label="Scroll to features section">
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-2" style="font-weight: 700; color: var(--primary-color);">
+            <i class="fas fa-star me-2"></i>Why Choose ParkEase?
+        </h2>
+        <p class="text-center mb-5" style="color: var(--light-text); max-width: 600px; margin: 0 auto;">
+            Experience the future of parking management with our innovative features
+        </p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <div class="icon-circle">
+                                <i class="fas fa-mobile-alt fa-2x" style="color: var(--primary-color);"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold">Easy Booking</h5>
+                        <p class="card-text" style="color: var(--light-text);">Book parking spots with just a few clicks. Our intuitive interface makes parking management a breeze.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <div class="icon-circle">
+                                <i class="fas fa-chart-line fa-2x" style="color: var(--primary-color);"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold">Smart Analytics</h5>
+                        <p class="card-text" style="color: var(--light-text);">Track your parking history and costs. Get insights into your parking patterns and expenses.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <div class="icon-circle">
+                                <i class="fas fa-map-marker-alt fa-2x" style="color: var(--primary-color);"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold">Multiple Locations</h5>
+                        <p class="card-text" style="color: var(--light-text);">Access parking spots across various locations. Find the perfect spot near your destination.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section py-5" style="background-color: var(--light-bg);">
+    <div class="container">
+        <h2 class="text-center mb-2" style="font-weight: 700; color: var(--primary-color);">
+            <i class="fas fa-tasks me-2"></i>How It Works
+        </h2>
+        <p class="text-center mb-5" style="color: var(--light-text); max-width: 600px; margin: 0 auto;">
+            Get started with ParkEase in four simple steps
+        </p>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="step-number mb-3">
+                        <span class="badge rounded-circle p-3" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); width: 70px; height: 70px; font-size: 1.5rem;">
+                            <i class="fas fa-user-plus"></i>
+                        </span>
+                    </div>
+                    <h5 class="fw-bold">Create Account</h5>
+                    <p style="color: var(--light-text);">Sign up for a free account to get started</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="step-number mb-3">
+                        <span class="badge rounded-circle p-3" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); width: 70px; height: 70px; font-size: 1.5rem;">
+                            <i class="fas fa-search-location"></i>
+                        </span>
+                    </div>
+                    <h5 class="fw-bold">Find Parking</h5>
+                    <p style="color: var(--light-text);">Browse available parking spots near you</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="step-number mb-3">
+                        <span class="badge rounded-circle p-3" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); width: 70px; height: 70px; font-size: 1.5rem;">
+                            <i class="fas fa-calendar-check"></i>
+                        </span>
+                    </div>
+                    <h5 class="fw-bold">Book Spot</h5>
+                    <p style="color: var(--light-text);">Reserve your preferred parking spot</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="step-number mb-3">
+                        <span class="badge rounded-circle p-3" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); width: 70px; height: 70px; font-size: 1.5rem;">
+                            <i class="fas fa-credit-card"></i>
+                        </span>
+                    </div>
+                    <h5 class="fw-bold">Park & Pay</h5>
+                    <p style="color: var(--light-text);">Park your vehicle and pay automatically</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-2" style="font-weight: 700; color: var(--primary-color);">
+            <i class="fas fa-comments me-2"></i>What Our Users Say
+        </h2>
+        <p class="text-center mb-5" style="color: var(--light-text); max-width: 600px; margin: 0 auto;">
+            Join thousands of satisfied users who have transformed their parking experience
+        </p>
+        
+        <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <!-- Carousel Items -->
+            <div class="carousel-inner">
+                <!-- Testimonial Group 1 -->
+                <div class="carousel-item active">
+                    <div class="row g-4">
+                        <!-- Testimonial 1 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+                                            <i class="fas fa-user-tie text-white fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">Annu Bharti</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text" style="color: var(--light-text);">
+                                        <i class="fas fa-quote-left me-2 text-primary"></i>
+                                        ParkEase has completely transformed my daily commute. Finding parking is now stress-free, and the app's real-time availability feature is incredibly accurate.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Testimonial 2 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+                                            <i class="fas fa-user text-white fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">Hritik Singh</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text" style="color: var(--light-text);">
+                                        <i class="fas fa-quote-left me-2 text-primary"></i>
+                                        As a business owner, ParkEase has helped me manage my fleet parking efficiently. The automated payment system saves us hours every week.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial Group 2 -->
+                <div class="carousel-item">
+                    <div class="row g-4">
+                        <!-- Testimonial 3 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+                                            <i class="fas fa-user-tie text-white fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">Harsh Shukla</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text" style="color: var(--light-text);">
+                                        <i class="fas fa-quote-left me-2 text-primary"></i>
+                                        The customer support is exceptional. Any issues I've had were resolved quickly and professionally.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Testimonial 4 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+                                            <i class="fas fa-user text-white fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">Aditya Tripathi</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text" style="color: var(--light-text);">
+                                        <i class="fas fa-quote-left me-2 text-primary"></i>
+                                        The mobile app is incredibly user-friendly. I can book a spot in seconds, and the navigation to the parking location is spot-on.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial Group 3 -->
+                <div class="carousel-item">
+                    <div class="row g-4">
+                        <!-- Testimonial 5 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+                                            <i class="fas fa-user-tie text-white fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">Vishal Baraiya</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text" style="color: var(--light-text);">
+                                        <i class="fas fa-quote-left me-2 text-primary"></i>
+                                        The monthly subscription plan has saved me a lot of money. The app's smart suggestions for parking spots based on my schedule are a game-changer.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Testimonial 6 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+                                            <i class="fas fa-user text-white fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">Hari Shukla</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text" style="color: var(--light-text);">
+                                        <i class="fas fa-quote-left me-2 text-primary"></i>
+                                        The real-time parking availability feature has been a lifesaver during peak hours. I can quickly find available spots near my destination without any hassle.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: var(--white);">
+    <div class="container text-center">
+        <h2 class="mb-4 fw-bold">Ready to Simplify Your Parking Experience?</h2>
+        <p class="lead mb-4" style="opacity: 0.9;">Join thousands of users who have already made parking easier with ParkEase.</p>
+        {# {% if not current_user.is_authenticated %} #}
+        <a href="{{ url_for('main.register') }}" class="btn btn-light btn-lg px-5">
+            <i class="fas fa-rocket me-2"></i>Get Started Now
+        </a>
+        {# {% endif %} #}
+    </div>
+</section>
+{% endblock %}
+
+{% block head %}
+<style>
+/* Import Google Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* Import Google Space Grotesk font */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* Apply Poppins font to all elements */
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Apply Space Grotesk font to hero text */
+.hero-text h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+}
+
+.hero-text .lead {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+}
+
+/* Update card shadow styles */
+.card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12),
+                0 4px 16px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background-color: rgba(255, 255, 255, 0.95);
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15),
+                0 8px 24px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Ensure consistent card styling across all sections */
+.features-section .card,
+.testimonials-section .card,
+.how-it-works-section .card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+                0 4px 16px rgba(0, 0, 0, 0.06),
+                0 0 0 1px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background-color: #ffffff;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.features-section .card:hover,
+.testimonials-section .card:hover,
+.how-it-works-section .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12),
+                0 8px 24px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Dark mode styles for cards */
+body[data-theme="dark"] .card {
+    background: #000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 0 20px rgba(255, 255, 255, 0.03) !important;
+}
+
+body[data-theme="dark"] .card:hover {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.04) !important;
+}
+
+body[data-theme="dark"] .card-body {
+    background: #000 !important;
+}
+
+body[data-theme="dark"] .card-title {
+    color: #fff !important;
+}
+
+body[data-theme="dark"] .card-text {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+body[data-theme="dark"] .feature-icon i {
+    color: #03a9f4 !important;
+}
+
+body[data-theme="dark"] .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Dark mode styles for testimonials */
+body[data-theme="dark"] .testimonials-section {
+    background-color: #000 !important;
+}
+
+body[data-theme="dark"] .testimonials-section .card {
+    background: #000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 0 20px rgba(255, 255, 255, 0.03) !important;
+}
+
+body[data-theme="dark"] .testimonials-section .card:hover {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.04) !important;
+}
+
+body[data-theme="dark"] .testimonials-section .card-body {
+    background: #000 !important;
+}
+
+body[data-theme="dark"] .testimonials-section .card-title {
+    color: #fff !important;
+}
+
+body[data-theme="dark"] .testimonials-section .card-text {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+body[data-theme="dark"] .testimonials-section .rounded-circle {
+    background-color: rgba(3, 169, 244, 0.2) !important;
+}
+
+body[data-theme="dark"] .testimonials-section .text-warning {
+    color: #ff9800 !important;
+}
+
+body[data-theme="dark"] .testimonials-section h2,
+body[data-theme="dark"] .testimonials-section p {
+    color: #fff !important;
+}
+
+/* Add subtle shadow to card content for better depth */
+.card-body {
+    position: relative;
+    z-index: 1;
+    background-color: #ffffff;
+}
+
+/* Ensure card text remains readable */
+.card-text {
+    color: var(--light-text);
+    line-height: 1.6;
+}
+
+/* Add subtle border radius to cards */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Ensure consistent card padding */
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Add inner shadow to cards for better depth */
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+@media (max-width: 767.98px) {
+    .card {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06),
+                    0 3px 12px rgba(0, 0, 0, 0.04),
+                    0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+    
+    .card:hover {
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08),
+                    0 6px 16px rgba(0, 0, 0, 0.06),
+                    0 0 0 1px rgba(0, 0, 0, 0.12);
+    }
+}
+
+.hero-section {
+    background-image: url('/static/parking_lot.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin-top: -1.5rem;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 80px);
+    padding: 2rem 1rem;
+    width: 100%;
+}
+
+.hero-text {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.hero-text h1 {
+    color: #fff;
+    font-size: 3.5rem;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+.hero-text .lead {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.5rem;
+    line-height: 1.5;
+    margin-bottom: 2.5rem;
+    padding: 0 1rem;
+    font-weight: 400;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.stats-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0, 96, 100, 0.05) 0%, rgba(0, 131, 143, 0.05) 100%);
+    min-width: 120px;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 991.98px) {
+    .hero-text h1 {
+        font-size: 2.75rem;
+        white-space: normal;
+    }
+    
+    .hero-text .lead {
+        font-size: 1.25rem;
+    }
+    
+    .btn-primary {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-content {
+        padding: 1.5rem 1rem;
+        min-height: calc(100vh - 60px);
+    }
+
+    .hero-text h1 {
+        font-size: 2.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-text .lead {
+        font-size: 1.1rem;
+        margin-bottom: 1.75rem;
+        padding: 0 0.5rem;
+    }
+    
+    .stats-row {
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .stat-item {
+        min-width: 100px;
+        padding: 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        max-width: 280px;
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-content {
+        padding: 1rem;
+        min-height: calc(100vh - 50px);
+    }
+
+    .hero-text h1 {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero-text .lead {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0;
+    }
+    
+    .stats-row {
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+    }
+    
+    .stat-item {
+        min-width: 90px;
+        padding: 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+
+    .btn-primary {
+        max-width: 240px;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 375px) {
+    .hero-text h1 {
+        font-size: 1.75rem;
+    }
+    
+    .hero-text .lead {
+        font-size: 0.95rem;
+    }
+    
+    .stat-item {
+        min-width: 80px;
+    }
+
+    .stat-number {
+        font-size: 1.35rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+}
+
+/* Accessibility */
+.btn:focus,
+.form-control:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+[role="button"],
+button,
+.btn {
+    cursor: pointer;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-out;
+}
+
+.animate-fade-in-delay {
+    animation: fadeIn 1s ease-out 0.3s both;
+}
+
+.animate-fade-in-delay-2 {
+    animation: fadeIn 1s ease-out 0.6s both;
+}
+
+.animate-fade-in-delay-3 {
+    animation: fadeIn 1s ease-out 0.9s both;
+}
+
+.animate-bounce {
+    animation: bounce 2s infinite;
+}
+
+/* Add smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 767.98px) {
+    .btn {
+        padding: 0.75rem 1.5rem;
+        min-height: 44px;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0, 96, 100, 0.1) 0%, rgba(0, 131, 143, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .stats-row {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .stat-item {
+        min-width: 100px;
+        padding: 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+}
+
+/* Testimonials Carousel Styles */
+.testimonials-section .carousel {
+    padding: 0 1rem;
+}
+
+.testimonials-section .carousel-item {
+    padding: 1rem 0;
+}
+
+.testimonials-section .carousel-indicators {
+    margin-bottom: 0;
+    position: relative;
+    margin-top: 2rem;
+}
+
+.testimonials-section .carousel-indicators button {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 5px;
+    background-color: var(--primary-color);
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.testimonials-section .carousel-indicators button.active {
+    opacity: 1;
+}
+
+/* Dark Mode Styles */
+body[data-theme="dark"] .testimonials-section .carousel-indicators button {
+    background-color: var(--accent-color);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .testimonials-section .carousel {
+        padding: 0 0.5rem;
+    }
+    
+    .testimonials-section .carousel-item .col-md-6:last-child {
+        display: none;
+    }
+    
+    .testimonials-section .carousel-indicators {
+        margin-top: 1.5rem;
+    }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+{% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const animation = lottie.loadAnimation({
+                container: document.getElementById('parkingAnimation'),
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'https://assets2.lottiefiles.com/packages/lf20_1k6v1v1v.json' // 3D Parking Car animation
+            });
+
+            animation.addEventListener('data_failed', function() {
+                console.error('Animation failed to load');
+                document.getElementById('parkingAnimation').innerHTML = '<div class="text-center text-white"><i class="fas fa-car fa-4x mb-3"></i><p>Smart Parking Solutions</p></div>';
+            });
+        } catch (error) {
+            console.error('Error loading animation:', error);
+            document.getElementById('parkingAnimation').innerHTML = '<div class="text-center text-white"><i class="fas fa-car fa-4x mb-3"></i><p>Smart Parking Solutions</p></div>';
+        }
+    });
+</script>
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<script>
+  // Lottie 3D animation for hero banner (Smart Parking)
+  document.addEventListener('DOMContentLoaded', function() {
+    var container = document.getElementById('parkingAnimation');
+    if (container) {
+      lottie.loadAnimation({
+        container: container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'https://assets2.lottiefiles.com/packages/lf20_1k6v1v1v.json' // 3D Parking Car animation
+      });
+    }
+  });
+</script>
+{% endblock %}
