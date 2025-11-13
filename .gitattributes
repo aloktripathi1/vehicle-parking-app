@@ -2,14 +2,14 @@
 * text=auto
 
 # Python
-*.py text eol=lf
-*.pyx text eol=lf
+*.py text eol=lf linguist-language=Python
+*.pyx text eol=lf linguist-language=Python
 
 # Web files
-*.html text eol=lf
-*.css text eol=lf
-*.js text eol=lf
-*.json text eol=lf
+*.html text eol=lf linguist-language=HTML
+*.css text eol=lf linguist-language=CSS
+*.js text eol=lf linguist-language=JavaScript
+*.json text eol=lf linguist-language=JSON
 
 # Documentation
 *.md text eol=lf
