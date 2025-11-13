@@ -1,7 +1,7 @@
 # Vehicle Parking App
 
 A multi-user 4-wheeler parking management system built with Flask and SQLite.  
-This project is part of **Modern Application Development I** at IITM.
+This project is part of **Modern Application Development I** at IITM BS.
 
 ## 👥 Roles
 
@@ -18,50 +18,6 @@ This project is part of **Modern Application Development I** at IITM.
 - Bootstrap 5.3 (CSS Framework)
 - Bootstrap Icons (Icons)
 - HTML/CSS (Frontend - simplified, minimal custom styling)
-
-## 📁 Project Structure
-
-```
-parking_app_23f3003225/
-├── app.py                # Main application entry point
-├── models.py             # Database models
-├── forms.py              # WTForms definitions
-├── utils.py              # Utility functions (e.g., timezone)
-├── requirements.txt      # Python dependencies
-├── README.md             # Project documentation
-├── instance/
-│   └── database.db       # SQLite database (auto-created)
-├── migrations/           # Alembic migration files
-├── routes/               # All Flask route blueprints
-│   ├── admin/            # Admin routes (dashboard, lots, users, history, etc.)
-│   ├── api/              # API endpoints (AJAX, data, etc.)
-│   ├── main/             # Main/public routes (index, login, register)
-│   └── user/             # User routes (dashboard, booking, profile)
-├── static/               # Static assets
-│   ├── parking_lot.jpg   # Images
-│   └── parking_lot1.jpg
-├── templates/            # Jinja2 HTML templates
-│   ├── admin/            # Admin templates
-│   │   ├── admin_dashboard.html
-│   │   ├── admin_parking_lots.html
-│   │   ├── admin_occupied_spots.html
-│   │   ├── admin_users.html
-│   │   ├── admin_parking_history.html
-│   │   ├── admin_user_reservations.html
-│   │   └── edit_parking_lot.html
-│   ├── user/             # User templates
-│   │   ├── user_dashboard.html
-│   │   ├── user_parking_lots.html
-│   │   ├── book_spot.html
-│   │   └── edit_profile.html
-│   └── main/             # Main/public templates
-│       ├── base.html
-│       ├── index.html
-│       ├── login.html
-│       ├── register.html
-│       └── error.html
-└── ...
-```
 
 ## 🛣️ Route Organization
 
