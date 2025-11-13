@@ -12,46 +12,27 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     name = db.Column(db.String(100), nullable=False)
-    address = db.Column(db.String(200), nullable=False)
-    pincode = db.Column(db.String(10), nullable=False)
+    address = db.Column(db.String(200), nullable=False, default='')
+    pincode = db.Column(db.String(10), nullable=False, default='')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_type = db.Column(db.String(20), default='user')
+    role = db.Column(db.String(20), default='user')  # 'user' or 'admin'
     
     reservations = db.relationship('Reservation', backref='user', lazy=True)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-        print(f"Password hash generated for user {self.email}")
+        print(f"Password hash generated for {self.role} {self.email}")
     
     def check_password(self, password):
         result = check_password_hash(self.password_hash, password)
-        print(f"Password check for user {self.email}: {'success' if result else 'failed'}")
+        print(f"Password check for {self.role} {self.email}: {'success' if result else 'failed'}")
         return result
     
-    def __repr__(self):
-        return f'<User {self.email}>'
-
-class Admin(UserMixin, db.Model):
-    __tablename__ = 'admins'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
-    name = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_type = db.Column(db.String(20), default='admin')
-    
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-        print(f"Password hash generated for admin {self.email}")
-    
-    def check_password(self, password):
-        result = check_password_hash(self.password_hash, password)
-        print(f"Password check for admin {self.email}: {'success' if result else 'failed'}")
-        return result
+    def is_admin(self):
+        return self.role == 'admin'
     
     def __repr__(self):
-        return f'<Admin {self.email}>'
+        return f'<User {self.email} ({self.role})>'
 
 class ParkingLot(db.Model):
     __tablename__ = 'parking_lots'

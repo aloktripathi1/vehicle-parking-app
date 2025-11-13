@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, current_app
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Admin, ParkingLot, ParkingSpot, Reservation
+from models import db, User, ParkingLot, ParkingSpot, Reservation
 from forms import LoginForm, RegisterForm, ParkingLotForm, EditUserForm
 from flask_migrate import Migrate
 import sqlite3
@@ -42,28 +42,37 @@ app.jinja_env.globals.update(
 
 from routes.main import main_bp
 from routes.admin import admin_bp
-from routes.api import api_bp
 from routes.user import user_bp
 
 app.register_blueprint(main_bp)
 app.register_blueprint(admin_bp, url_prefix='/admin')
-app.register_blueprint(api_bp, url_prefix='/api')
 app.register_blueprint(user_bp, url_prefix='/user')
+
+def create_default_admin():
+    """Create default admin user if not exists"""
+    admin_email = os.environ.get('ADMIN_EMAIL', 'admin@parkease.com')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+    admin_name = os.environ.get('ADMIN_NAME', 'Admin User')
+    
+    admin = User.query.filter_by(email=admin_email, role='admin').first()
+    if not admin:
+        admin = User(
+            email=admin_email,
+            name=admin_name,
+            role='admin',
+            address='',
+            pincode=''
+        )
+        admin.set_password(admin_password)
+        db.session.add(admin)
+        db.session.commit()
+        print(f"Default admin created: {admin_email}")
+    else:
+        print(f"Admin already exists: {admin_email}")
 
 with app.app_context():
     db.create_all()
-    admin = Admin.query.filter_by(email='admin@parkease.com').first()
-    if not admin:
-        admin = Admin(
-            email='admin@parkease.com',
-            name='Admin User'
-        )
-        admin.set_password('admin123')
-        db.session.add(admin)
-        db.session.commit()
-    # else:
-    #     admin.set_password('admin123')
-    #     db.session.commit()
+    create_default_admin()
 
 # -------------------- Error Handling --------------------
 
@@ -74,8 +83,6 @@ def internal_error(error):
 
 @login_manager.user_loader
 def load_user(user_id):
-    if session.get('user_type') == 'admin':
-        return Admin.query.get(int(user_id))
     return User.query.get(int(user_id))
 
 def has_active_booking(user_id):
